@@ -7,32 +7,48 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800&family=Noto+Serif+Hebrew:wght@500;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800&family=Noto+Serif+Hebrew:wght@500;700;800&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
     <header class="site-header">
-      <a class="logo" href="#" aria-label="תורה ברורה">
+      <a class="logo" href="./index.html" aria-label="תורה ברורה">
         <span class="logo-mark">תב</span>
-        <span>תורה ברורה</span>
+        <span class="logo-text">תורה ברורה</span>
       </a>
       <nav class="top-nav" aria-label="ניווט ראשי">
-        <a href="#">אודות</a>
-        <a href="#">פעילות</a>
-        <a href="#">ספרים</a>
-        <a href="#">צור קשר</a>
+        <a href="./map.html">על המפה</a>
+        <a href="./portal.html">הפורטל התורני</a>
+        <a href="./campus.html">קריית הישיבה</a>
+        <a href="./partner.html">להיות שותף</a>
+        <a href="./contact.html">צור קשר</a>
       </nav>
-      <a class="header-cta" href="#donations">להיות שותף</a>
+      <a class="header-cta" href="./partner.html">להיות שותף</a>
     </header>
 
     <main>
       <section class="hero" aria-labelledby="main-title">
+        <div class="hero-ornament" aria-hidden="true"></div>
         <div class="hero-content">
           <p class="kicker">זה השער</p>
           <h1 id="main-title">תורה ברורה</h1>
           <p class="subtitle">החלק שלך בתורת ארץ ישראל</p>
+        </div>
+      </section>
+
+      <section class="portal-section" aria-label="שערי האתר">
+        <div class="portal-grid">
+          <a class="portal-card portal-map" href="./map.html">
+            <span>על המפה</span>
+          </a>
+          <a class="portal-card portal-torah" href="./portal.html">
+            <span>הפורטל התורני</span>
+          </a>
+          <a class="portal-card portal-campus" href="./campus.html">
+            <span>קריית הישיבה</span>
+          </a>
         </div>
       </section>
 
@@ -43,7 +59,7 @@
             <div class="card-overlay">
               <p>תרומה</p>
               <h3>לכוללים</h3>
-              <a href="#" class="donation-link">לתרומה</a>
+              <a href="./partner.html" class="donation-link">לתרומה</a>
             </div>
           </article>
 
@@ -51,7 +67,7 @@
             <div class="card-overlay">
               <p>שותפות</p>
               <h3>בבניית יישובים</h3>
-              <a href="#" class="donation-link">לתרומה</a>
+              <a href="./partner.html" class="donation-link">לתרומה</a>
             </div>
           </article>
 
@@ -59,7 +75,7 @@
             <div class="card-overlay">
               <p>סיוע</p>
               <h3>להוצאת ספרים</h3>
-              <a href="#" class="donation-link">לתרומה</a>
+              <a href="./partner.html" class="donation-link">לתרומה</a>
             </div>
           </article>
 
@@ -67,21 +83,22 @@
             <div class="card-overlay">
               <p>חיזוק</p>
               <h3>העלייה לארץ</h3>
-              <a href="#" class="donation-link">לתרומה</a>
+              <a href="./partner.html" class="donation-link">לתרומה</a>
             </div>
           </article>
         </div>
-
-        <a class="general-donation" href="#">לתרומה כללית</a>
       </section>
     </main>
 
     <footer class="site-footer">
-      <div>
-        <strong>תורה ברורה</strong>
-        <span>עמותה ללימוד תורה בארץ ישראל</span>
-      </div>
-      <a href="mailto:info@torah-berura.org">info@torah-berura.org</a>
+      <a class="footer-logo" href="./index.html">תורה ברורה</a>
+      <nav aria-label="ניווט תחתון">
+        <a href="./map.html">על המפה</a>
+        <a href="./portal.html">הפורטל התורני</a>
+        <a href="./campus.html">קריית הישיבה</a>
+        <a href="./partner.html">להיות שותף</a>
+        <a href="./contact.html">צור קשר</a>
+      </nav>
     </footer>
   </body>
 </html>
