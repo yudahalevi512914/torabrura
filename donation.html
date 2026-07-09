@@ -87,10 +87,11 @@
           <span>שותפות חודשית</span>
           <strong>₪7,200</strong>
         </a>
-        <a href="./donation.html?amount=custom#amounts" class="amount-card">
+        <form class="amount-card custom-amount-card" data-custom-amount>
           <span>סכום לבחירה</span>
-          <strong>הכנסת תרומה ידנית</strong>
-        </a>
+          <input type="number" name="custom-amount" min="1" placeholder="הקלידו סכום" aria-label="סכום תרומה ידני" />
+          <button type="submit">בחר</button>
+        </form>
       </section>
 
       <section class="donation-form-shell donation-flow" aria-label="פרטי התרומה">
@@ -154,6 +155,19 @@
       }
       if (amount && amountInput) {
         amountInput.value = amount === "custom" ? "" : amount;
+      }
+      var customAmountForm = document.querySelector("[data-custom-amount]");
+      if (customAmountForm) {
+        customAmountForm.addEventListener("submit", function (event) {
+          event.preventDefault();
+          var customInput = customAmountForm.querySelector('input[name="custom-amount"]');
+          var customAmount = customInput.value;
+          if (!customAmount) {
+            customInput.focus();
+            return;
+          }
+          window.location.href = "./donation.html?amount=" + encodeURIComponent(customAmount) + "#amounts";
+        });
       }
     </script>
   </body>
