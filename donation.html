@@ -87,6 +87,10 @@
           <span>שותפות חודשית</span>
           <strong>₪7,200</strong>
         </a>
+        <a href="./donation.html?amount=custom#amounts" class="amount-card">
+          <span>סכום לבחירה</span>
+          <strong>הכנסת תרומה ידנית</strong>
+        </a>
       </section>
 
       <section class="donation-form-shell donation-flow" aria-label="פרטי התרומה">
@@ -149,7 +153,7 @@
         choiceSection.hidden = true;
       }
       if (amount && amountInput) {
-        amountInput.value = amount;
+        amountInput.value = amount === "custom" ? "" : amount;
       }
     </script>
   </body>
