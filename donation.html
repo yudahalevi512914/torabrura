@@ -29,12 +29,14 @@
       <a class="header-cta" href="./index.html">חזרה לעמוד הראשי</a>
     </header>
 
+
     <main class="donation-page">
       <section class="donation-hero" aria-labelledby="donation-page-title">
         <p>להיות שותף</p>
         <h1 id="donation-page-title">בחרו את התרומה שלכם</h1>
         <span>הזכות שלכם בלימוד תורה בארץ ישראל</span>
       </section>
+
 
       <section class="donation-section donation-choice-section" aria-label="בחירת תחום תרומה">
         <h2>בחרו את השותפות שלכם</h2>
@@ -50,11 +52,6 @@
             <div class="card-overlay">
               <p>בניין וחיזוק</p>
               <h3>תרומה ליישוב הארץ</h3>
-              <div class="settlement-levels" aria-label="אפשרויות שותפות ליישוב הארץ">
-                <span>תומך</span>
-                <span>שותף</span>
-                <span>מתישב</span>
-              </div>
               <a class="donation-link" href="./donation.html?category=settlements&amount=180#amounts">לתרומה</a>
             </div>
           </article>
@@ -74,6 +71,7 @@
           </article>
         </div>
       </section>
+
 
       <section id="amounts" class="donation-amounts donation-flow" aria-label="בחירת סכום תרומה">
         <a href="./donation.html?amount=180" class="amount-card">
@@ -97,6 +95,7 @@
         </div>
       </section>
 
+
       <section class="donation-form-shell donation-flow" aria-label="פרטי התרומה">
         <form class="donation-form">
           <h2>פרטים אישיים</h2>
@@ -117,6 +116,7 @@
             <input type="email" name="email" autocomplete="email" />
           </label>
 
+
           <h2>הקדשה</h2>
           <label>
             סוג הקדשה
@@ -131,6 +131,7 @@
             שם להקדשה
             <input type="text" name="dedication-name" />
           </label>
+
 
           <h2>תשלום</h2>
           <label>
@@ -149,6 +150,7 @@
       var customAmountInput = document.querySelector('input[name="custom-amount"]');
       var amountCards = document.querySelectorAll(".donation-amounts > a.amount-card");
       var isKollelimDonation = category === "kollelim" || (!category && amount === "180");
+      var isSettlementsDonation = category === "settlements";
       var isBooksDonation = category === "books" || (!category && amount === "3600");
       var isAliyahDonation = category === "aliyah" || (!category && amount === "7200");
       var flowSections = document.querySelectorAll(".donation-flow");
@@ -166,6 +168,22 @@
         });
         if (!["1000", "4000", "12000"].includes(amount)) {
           amount = "1000";
+        }
+      }
+      if (isSettlementsDonation && amountCards.length >= 3) {
+        var settlementAmounts = [
+          { label: "תומך", amount: "180", display: '₪180' },
+          { label: "שותף", amount: "720", display: '₪720' },
+          { label: "מתישב", amount: "1200", display: '₪1,200' },
+        ];
+        settlementAmounts.forEach((item, index) => {
+          var card = amountCards[index];
+          card.hidden = false;
+          card.href = `./donation.html?category=settlements&amount=${item.amount}#amounts`;
+          card.innerHTML = `<span>${item.label}</span><strong>${item.display}</strong>`;
+        });
+        if (!["180", "720", "1200"].includes(amount)) {
+          amount = "180";
         }
       }
       if (isBooksDonation && amountCards.length >= 3) {
@@ -186,9 +204,9 @@
       }
       if (isAliyahDonation && amountCards.length >= 3) {
         var aliyahAmounts = [
-          { label: "תומך", amount: "1200", display: '₪1,200' },
-          { label: "שותף", amount: "3600", display: '₪3,600' },
-          { label: "מתישב", amount: "10000", display: '₪10,000' },
+          { label: "גואל", amount: "1200", display: '₪1,200' },
+          { label: "מציל", amount: "3600", display: '₪3,600' },
+          { label: "מביא", amount: "10000", display: '₪10,000' },
         ];
         aliyahAmounts.forEach((item, index) => {
           var card = amountCards[index];
@@ -220,6 +238,3 @@
     </script>
   </body>
 </html>
-
-
-
