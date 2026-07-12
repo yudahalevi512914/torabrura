@@ -62,7 +62,7 @@ a {
   height: 56px;
   place-items: center;
   overflow: hidden;
-  background: #f7f0df var(--site-logo-image) 55% center / 230% auto no-repeat;
+  background: #f7f0df var(--site-logo-image) center / 118% auto no-repeat;
   border: 2px solid rgba(234, 212, 164, 0.84);
   border-radius: 50%;
   box-shadow: 0 0 0 2px rgba(9, 24, 43, 0.2);
@@ -168,7 +168,7 @@ a {
   width: min(220px, 46vw);
   aspect-ratio: 1;
   margin-bottom: 22px;
-  background: #f7f0df var(--site-logo-image) 55% center / 230% auto no-repeat;
+  background: #f7f0df var(--site-logo-image) center / 118% auto no-repeat;
   border: 4px solid rgba(234, 212, 164, 0.9);
   border-radius: 50%;
   box-shadow: 0 20px 46px rgba(0, 0, 0, 0.25);
