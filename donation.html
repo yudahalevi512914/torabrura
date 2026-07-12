@@ -171,7 +171,7 @@
         var bookAmounts = [
           { label: "הקדשת עמוד", amount: "1000", display: '1,000 ש"ח' },
           { label: "הקדשת ספר", amount: "10000", display: '10,000 ש"ח' },
-          { label: "הקדשת שער", amount: "1200", display: '1,200 ש"ח' },
+          { label: "הקדשת שער", amount: "5000", display: '5,000 ש"ח' },
         ];
         bookAmounts.forEach((item, index) => {
           var card = amountCards[index];
@@ -179,7 +179,7 @@
           card.href = `./donation.html?category=books&amount=${item.amount}#amounts`;
           card.innerHTML = `<span>${item.label}</span><strong>${item.display}</strong>`;
         });
-        if (!["1000", "10000", "1200"].includes(amount)) {
+        if (!["1000", "10000", "5000"].includes(amount)) {
           amount = "1000";
         }
       }
