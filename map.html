@@ -11,6 +11,49 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="./styles.css" />
+    <style>
+      .news-page {
+        display: grid;
+        place-items: center;
+        padding: 96px 24px;
+      }
+
+      .news-feature-card {
+        width: min(980px, 100%);
+        padding: clamp(32px, 5vw, 62px);
+        color: var(--ink);
+        background:
+          linear-gradient(135deg, rgba(255, 255, 255, 0.94), rgba(248, 244, 234, 0.9)),
+          var(--stone-light);
+        border: 1px solid rgba(197, 154, 70, 0.34);
+        border-radius: 8px;
+        box-shadow: var(--shadow);
+      }
+
+      .news-feature-card span {
+        display: inline-flex;
+        margin-bottom: 16px;
+        color: var(--gold-dark);
+        font-size: 18px;
+        font-weight: 800;
+      }
+
+      .news-feature-card h1 {
+        margin: 0 0 22px;
+        font-family: "Noto Serif Hebrew", serif;
+        font-size: clamp(34px, 5vw, 58px);
+        line-height: 1.14;
+      }
+
+      .news-feature-card p {
+        max-width: 860px;
+        margin: 0;
+        color: var(--ink-soft);
+        font-size: clamp(20px, 2.3vw, 27px);
+        font-weight: 500;
+        line-height: 1.75;
+      }
+    </style>
   </head>
   <body>
     <header class="site-header">
