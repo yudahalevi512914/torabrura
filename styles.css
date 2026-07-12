@@ -976,13 +976,17 @@ h1 {
 
 .amount-card span {
   color: var(--ink-soft);
+  font-size: clamp(22px, 2.4vw, 30px);
   font-weight: 800;
+  line-height: 1.2;
 }
 
 .amount-card strong {
   color: var(--gold-dark);
   font-family: "Noto Serif Hebrew", serif;
-  font-size: clamp(30px, 4vw, 44px);
+  font-size: clamp(32px, 4.2vw, 48px);
+  line-height: 1.1;
+  white-space: nowrap;
 }
 
 .custom-amount-card {
