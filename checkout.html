@@ -17,6 +17,398 @@
         margin: 0 auto 70px;
       }
 
+
+      .checkout-hero {
+        margin: 34px 0 24px;
+        padding: clamp(36px, 6vw, 70px);
+        color: var(--white);
+        text-align: center;
+        background:
+          linear-gradient(90deg, rgba(9, 24, 43, 0.94), rgba(9, 24, 43, 0.78)),
+          var(--kollelim-image) center / cover no-repeat;
+        border-top: 4px solid var(--gold);
+        box-shadow: var(--shadow);
+      }
+
+
+      .checkout-hero p {
+        margin: 0 0 10px;
+        color: var(--gold-light);
+        font-family: "Noto Serif Hebrew", serif;
+        font-size: clamp(22px, 3vw, 34px);
+        font-weight: 800;
+      }
+
+
+      .checkout-hero h1 {
+        margin: 0;
+        font-family: "Noto Serif Hebrew", serif;
+        font-size: clamp(42px, 6vw, 76px);
+        line-height: 1.16;
+      }
+
+
+      .checkout-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 340px;
+        gap: 22px;
+        align-items: start;
+      }
+
+
+      .checkout-form,
+      .checkout-summary {
+        background: var(--white);
+        border: 1px solid rgba(197, 154, 70, 0.45);
+        border-top: 4px solid var(--gold);
+        box-shadow: var(--shadow);
+      }
+
+
+      .checkout-form {
+        display: grid;
+        gap: 22px;
+        padding: clamp(24px, 4vw, 38px);
+      }
+
+
+      .checkout-group {
+        display: grid;
+        gap: 16px;
+      }
+
+
+      .checkout-group h2,
+      .checkout-summary h2 {
+        margin: 0;
+        color: var(--ink-deep);
+        font-family: "Noto Serif Hebrew", serif;
+        font-size: 30px;
+      }
+
+
+      .checkout-fields {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+      }
+
+
+      .checkout-form label {
+        display: grid;
+        gap: 8px;
+        color: var(--ink-deep);
+        font-weight: 800;
+      }
+
+
+      .checkout-form input,
+      .checkout-form select,
+      .checkout-form textarea {
+        width: 100%;
+        min-height: 52px;
+        padding: 12px 14px;
+        color: var(--ink-deep);
+        background: var(--stone-light);
+        border: 1px solid rgba(67, 83, 108, 0.24);
+        border-radius: 3px;
+        font: inherit;
+      }
+
+
+      .checkout-form textarea {
+        min-height: 110px;
+        resize: vertical;
+      }
+
+
+      .checkout-form input[readonly] {
+        color: var(--gold-dark);
+        background: #fff8e7;
+        font-size: 22px;
+        font-weight: 900;
+      }
+
+
+      .checkout-note {
+        margin: 0;
+        color: var(--ink-soft);
+        font-size: 16px;
+        line-height: 1.6;
+        font-weight: 600;
+      }
+
+
+      .checkout-submit {
+        min-height: 58px;
+        color: var(--ink-deep);
+        background: linear-gradient(180deg, #f2dca8 0%, var(--gold) 100%);
+        border: 0;
+        border-radius: 3px;
+        font: inherit;
+        font-size: 20px;
+        font-weight: 900;
+        cursor: pointer;
+      }
+
+
+      .checkout-summary {
+        position: sticky;
+        top: 112px;
+        padding: 26px;
+      }
+
+
+      .summary-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 14px 0;
+        border-bottom: 1px solid rgba(197, 154, 70, 0.25);
+        font-size: 18px;
+        font-weight: 800;
+      }
+
+
+      .summary-row strong {
+        color: var(--gold-dark);
+      }
+
+
+      @media (max-width: 860px) {
+        .checkout-layout,
+        .checkout-fields {
+          grid-template-columns: 1fr;
+        }
+
+
+        .checkout-summary {
+          position: static;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="logo" href="./index.html" aria-label="תורה ברורה">
+        <span class="logo-mark" aria-hidden="true"></span>
+        <span class="logo-text">תורה ברורה</span>
+      </a>
+      <nav class="top-nav" aria-label="ניווט ראשי">
+        <a href="./map.html">מה חדש</a>
+        <a href="./portal.html">גלריה</a>
+        <a href="./campus.html">מהנעשה בשטח</a>
+        <a href="./partner.html">אירועים</a>
+        <a href="./contact.html">שיעורים</a>
+        <a href="./books.html">ספרים</a>
+      </nav>
+      <a class="header-cta" href="./donation.html">חזרה לבחירת תרומה</a>
+    </header>
+
+
+    <main class="checkout-page">
+      <section class="checkout-hero" aria-labelledby="checkout-title">
+        <p>השלמת התרומה</p>
+        <h1 id="checkout-title">מלאו פרטים והמשיכו לתרומה</h1>
+      </section>
+
+
+      <div class="checkout-layout">
+        <form class="checkout-form" data-checkout-form>
+          <section class="checkout-group" aria-label="פרטי תרומה">
+            <h2>פרטי התרומה</h2>
+            <div class="checkout-fields">
+              <label>
+                תחום התרומה
+                <input type="text" name="category-label" readonly />
+              </label>
+              <label>
+                סכום התרומה
+                <input type="number" name="amount" min="1" readonly />
+              </label>
+            </div>
+          </section>
+
+
+          <section class="checkout-group" aria-label="פרטים אישיים">
+            <h2>פרטים אישיים</h2>
+            <div class="checkout-fields">
+              <label>
+                שם פרטי
+                <input type="text" name="first-name" autocomplete="given-name" required />
+              </label>
+              <label>
+                שם משפחה
+                <input type="text" name="last-name" autocomplete="family-name" required />
+              </label>
+              <label>
+                טלפון
+                <input type="tel" name="phone" autocomplete="tel" required />
+              </label>
+              <label>
+                אימייל
+                <input type="email" name="email" autocomplete="email" required />
+              </label>
+            </div>
+          </section>
+
+
+          <section class="checkout-group" aria-label="הקדשה">
+            <h2>הקדשה</h2>
+            <div class="checkout-fields">
+              <label>
+                סוג הקדשה
+                <select name="dedication-type">
+                  <option>לזכות</option>
+                  <option>לעילוי נשמת</option>
+                  <option>לרפואת</option>
+                  <option>להצלחה</option>
+                </select>
+              </label>
+              <label>
+                שם להקדשה
+                <input type="text" name="dedication-name" />
+              </label>
+            </div>
+            <label>
+              הערות נוספות
+              <textarea name="notes" placeholder="אפשר להוסיף בקשה או הערה לתרומה"></textarea>
+            </label>
+          </section>
+
+
+          <section class="checkout-group" aria-label="פרטי אשראי">
+            <h2>פרטי אשראי</h2>
+            <p class="checkout-note">האזור הזה מוכן לחיבור למסוף הסליקה. בשלב החיבור נחליף את השדות או נחבר אותם לטוקן/מסוף המאובטח של חברת הסליקה, בלי לשמור פרטי כרטיס באתר.</p>
+            <div class="checkout-fields">
+              <label>
+                מספר כרטיס
+                <input type="text" name="card-number" inputmode="numeric" autocomplete="cc-number" placeholder="0000 0000 0000 0000" />
+              </label>
+              <label>
+                שם בעל הכרטיס
+                <input type="text" name="card-name" autocomplete="cc-name" />
+              </label>
+              <label>
+                תוקף
+                <input type="text" name="card-expiry" inputmode="numeric" autocomplete="cc-exp" placeholder="MM/YY" />
+              </label>
+              <label>
+                שלוש ספרות בגב הכרטיס
+                <input type="password" name="card-cvv" inputmode="numeric" autocomplete="cc-csc" maxlength="4" placeholder="CVV" />
+              </label>
+            </div>
+          </section>
+
+
+          <button type="submit" class="checkout-submit">המשך לתרומה</button>
+          <p class="checkout-note">לאחר חיבור Google Sheets, הפרטים יישמרו אוטומטית בגיליון. פרטי אשראי לא נשמרים בגיליון.</p>
+        </form>
+
+
+        <aside class="checkout-summary" aria-label="סיכום התרומה">
+          <h2>סיכום</h2>
+          <div class="summary-row">
+            <span>תחום</span>
+            <strong data-summary-category>תרומה</strong>
+          </div>
+          <div class="summary-row">
+            <span>סכום</span>
+            <strong data-summary-amount>₪0</strong>
+          </div>
+          <p class="checkout-note">לאחר קבלת פרטי המסוף נחבר את הכפתור הזה לסליקה בפועל.</p>
+        </aside>
+      </div>
+    </main>
+
+
+    <script>
+      window.TORA_BRURA_GOOGLE_SHEETS_URL = "";
+      var params = new URLSearchParams(window.location.search);
+      var amount = params.get("amount") || "";
+      var category = params.get("category") || "kollelim";
+      var labels = {
+        kollelim: "תרומה לכוללים",
+        settlements: "תרומה ליישוב הארץ",
+        books: "הוצאת ספרי קודש",
+        aliyah: "חיזוק העלייה לארץ",
+      };
+      var categoryLabel = labels[category] || "תרומה";
+      var amountInput = document.querySelector('input[name="amount"]');
+      var categoryInput = document.querySelector('input[name="category-label"]');
+      var summaryAmount = document.querySelector("[data-summary-amount]");
+      var summaryCategory = document.querySelector("[data-summary-category]");
+      if (amountInput) amountInput.value = amount;
+      if (categoryInput) categoryInput.value = categoryLabel;
+      if (summaryCategory) summaryCategory.textContent = categoryLabel;
+      if (summaryAmount) summaryAmount.textContent = amount ? "₪" + Number(amount).toLocaleString("he-IL") : "₪0";
+
+
+      var form = document.querySelector("[data-checkout-form]");
+      if (form) {
+        form.addEventListener("submit", async function (event) {
+          event.preventDefault();
+          var sheetsUrl = window.TORA_BRURA_GOOGLE_SHEETS_URL || "";
+          var donationData = {
+            submittedAt: new Date().toLocaleString("he-IL"),
+            category: categoryLabel,
+            categoryKey: category,
+            amount: amount,
+            firstName: form.elements["first-name"].value,
+            lastName: form.elements["last-name"].value,
+            phone: form.elements.phone.value,
+            email: form.elements.email.value,
+            dedicationType: form.elements["dedication-type"].value,
+            dedicationName: form.elements["dedication-name"].value,
+            notes: form.elements.notes.value,
+            source: "torabrura.vercel.app",
+          };
+
+          if (!sheetsUrl) {
+            alert("הטופס מוכן לשליחה ל-Google Sheets. חסר רק קישור Web App של הגיליון, ואז הנתונים יישמרו אוטומטית.");
+            return;
+          }
+
+          var button = form.querySelector(".checkout-submit");
+          var originalText = button.textContent;
+          button.disabled = true;
+          button.textContent = "שולח נתונים...";
+          try {
+            await fetch(sheetsUrl, {
+              method: "POST",
+              mode: "no-cors",
+              body: new URLSearchParams(donationData),
+            });
+            alert("הפרטים נקלטו ונשמרו בגיליון. בשלב הבא נחבר את מסוף הסליקה לתשלום בפועל.");
+          } catch (error) {
+            alert("הייתה בעיה בשליחת הנתונים לגיליון. נבדוק את קישור Google Sheets וננסה שוב.");
+          } finally {
+            button.disabled = false;
+            button.textContent = originalText;
+          }
+        });
+      }
+    </script>
+  </body>
+</html><!doctype html>
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>פרטי תרומה | תורה ברורה</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800&family=Noto+Serif+Hebrew:wght@500;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+    <style>
+      .checkout-page {
+        width: min(1180px, calc(100% - 32px));
+        margin: 0 auto 70px;
+      }
+
       .checkout-hero {
         margin: 34px 0 24px;
         padding: clamp(36px, 6vw, 70px);
