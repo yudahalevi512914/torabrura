@@ -11,6 +11,227 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="./styles.css" />
+    <style>
+      .custom-amount-card .custom-continue {
+        width: 100%;
+        min-height: 46px;
+        margin-top: 12px;
+        color: var(--ink-deep);
+        background: linear-gradient(180deg, #f2dca8 0%, var(--gold) 100%);
+        border: 0;
+        border-radius: 3px;
+        font: inherit;
+        font-weight: 900;
+        cursor: pointer;
+      }
+
+      .custom-amount-card .custom-continue:hover {
+        color: var(--white);
+        background: linear-gradient(180deg, #d5ae5d 0%, var(--gold-dark) 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="logo" href="./index.html" aria-label="תורה ברורה">
+        <span class="logo-mark" aria-hidden="true"></span>
+        <span class="logo-text">תורה ברורה</span>
+      </a>
+      <nav class="top-nav" aria-label="ניווט ראשי">
+        <a href="./map.html">מה חדש</a>
+        <a href="./portal.html">גלריה</a>
+        <a href="./campus.html">מהנעשה בשטח</a>
+        <a href="./partner.html">אירועים</a>
+        <a href="./contact.html">שיעורים</a>
+        <a href="./books.html">ספרים</a>
+      </nav>
+      <a class="header-cta" href="./index.html">חזרה לעמוד הראשי</a>
+    </header>
+
+
+
+
+
+
+
+
+    <main class="donation-page">
+      <section class="donation-hero" aria-labelledby="donation-page-title">
+        <p>להיות שותף</p>
+        <h1 id="donation-page-title">בחרו את התרומה שלכם</h1>
+        <span>הזכות שלכם בלימוד תורה בארץ ישראל</span>
+      </section>
+
+
+
+
+
+
+
+
+      <section class="donation-section donation-choice-section" aria-label="בחירת תחום תרומה">
+        <h2>בחרו את השותפות שלכם</h2>
+        <div class="donation-grid">
+          <article class="donation-card card-kollelim">
+            <div class="card-overlay">
+              <p>שותפות בלימוד</p>
+              <h3>תרומה לכוללים</h3>
+              <a class="donation-link" href="./donation.html?category=kollelim&amount=1000#amounts">לתרומה</a>
+            </div>
+          </article>
+          <article class="donation-card card-settlements">
+            <div class="card-overlay">
+              <p>בניין וחיזוק</p>
+              <h3>תרומה ליישוב הארץ</h3>
+              <a class="donation-link" href="./donation.html?category=settlements&amount=180#amounts">לתרומה</a>
+            </div>
+          </article>
+          <article class="donation-card card-books">
+            <div class="card-overlay">
+              <p>הפצת תורה</p>
+              <h3>הוצאת ספרי קודש</h3>
+              <a class="donation-link" href="./donation.html?category=books&amount=1000#amounts">לתרומה</a>
+            </div>
+          </article>
+          <article class="donation-card card-aliyah">
+            <div class="card-overlay">
+              <p>תורה בארץ</p>
+              <h3>חיזוק העלייה לארץ</h3>
+              <a class="donation-link" href="./donation.html?category=aliyah&amount=1200#amounts">לתרומה</a>
+            </div>
+          </article>
+        </div>
+      </section>
+
+
+
+
+
+
+
+
+      <section id="amounts" class="donation-amounts donation-flow" aria-label="בחירת סכום תרומה">
+        <a href="./donation.html?amount=180" class="amount-card">
+          <span>תומך</span>
+          <strong>₪180</strong>
+        </a>
+        <a href="./donation.html?amount=720" class="amount-card">
+          <span>שותף</span>
+          <strong>₪720</strong>
+        </a>
+        <a href="./donation.html?amount=1200" class="amount-card">
+          <span>מתישב</span>
+          <strong>₪1,200</strong>
+        </a>
+        <div class="amount-card custom-amount-card">
+          <span>אחת משלך</span>
+          <label>
+            <span>הקלידו סכום</span>
+            <input type="number" name="custom-amount" min="1" inputmode="numeric" placeholder="₪" />
+          </label>
+        </div>
+      </section>
+    </main>
+    <script>
+      var params = new URLSearchParams(window.location.search);
+      var amount = params.get("amount");
+      var category = params.get("category") || "kollelim";
+      var customAmountInput = document.querySelector('input[name="custom-amount"]');
+      var customAmountCard = document.querySelector(".custom-amount-card");
+      var amountCards = document.querySelectorAll(".donation-amounts > a.amount-card");
+      var flowSections = document.querySelectorAll(".donation-flow");
+      var choiceSection = document.querySelector(".donation-choice-section");
+
+      function checkoutUrl(nextAmount) {
+        return "./checkout.html?category=" + encodeURIComponent(category) + "&amount=" + encodeURIComponent(nextAmount);
+      }
+
+      function setAmounts(items, fallbackAmount) {
+        items.forEach((item, index) => {
+          var card = amountCards[index];
+          if (!card) return;
+          card.hidden = false;
+          card.href = checkoutUrl(item.amount);
+          card.innerHTML = "<span>" + item.label + "</span><strong>" + item.display + "</strong>";
+        });
+        if (!items.some((item) => item.amount === amount)) {
+          amount = fallbackAmount;
+        }
+      }
+
+      if (category === "kollelim") {
+        setAmounts([
+          { label: "פרנס היום", amount: "1000", display: "₪1,000" },
+          { label: "פרנס השבוע", amount: "4000", display: "₪4,000" },
+          { label: "פרנס החודש", amount: "12000", display: "₪12,000" },
+        ], "1000");
+      }
+
+      if (category === "settlements") {
+        setAmounts([
+          { label: "תומך", amount: "180", display: "₪180" },
+          { label: "שותף", amount: "720", display: "₪720" },
+          { label: "מתישב", amount: "1200", display: "₪1,200" },
+        ], "180");
+      }
+
+      if (category === "books") {
+        setAmounts([
+          { label: "הקדשת עמוד", amount: "1000", display: "₪1,000" },
+          { label: "הקדשת שער", amount: "5000", display: "₪5,000" },
+          { label: "הקדשת ספר", amount: "30000", display: "₪30,000" },
+        ], "1000");
+      }
+
+      if (category === "aliyah") {
+        setAmounts([
+          { label: "גואל", amount: "1200", display: "₪1,200" },
+          { label: "מציל", amount: "3600", display: "₪3,600" },
+          { label: "מביא", amount: "10000", display: "₪10,000" },
+        ], "1200");
+      }
+
+      if (customAmountCard && !customAmountCard.querySelector(".custom-continue")) {
+        var customButton = document.createElement("button");
+        customButton.type = "button";
+        customButton.className = "custom-continue";
+        customButton.textContent = "המשך תרומה";
+        customAmountCard.appendChild(customButton);
+        customButton.addEventListener("click", function () {
+          var customAmount = customAmountInput ? customAmountInput.value : "";
+          if (!customAmount) {
+            customAmountInput.focus();
+            return;
+          }
+          window.location.href = checkoutUrl(customAmount);
+        });
+      }
+
+      if (!amount && !category) {
+        flowSections.forEach((section) => {
+          section.hidden = true;
+        });
+      }
+
+      if ((amount || category) && choiceSection) {
+        document.body.classList.add("amount-selected");
+        choiceSection.hidden = true;
+      }
+    </script>
+  </body>
+</html><!doctype html>
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>תרומה | תורה ברורה</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800&family=Noto+Serif+Hebrew:wght@500;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
     <header class="site-header">
