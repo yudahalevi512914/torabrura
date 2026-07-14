@@ -1,16 +1,12 @@
 <!doctype html>
-<html lang="he" dir="rtl">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<html lang="he" dir="rtl"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>פרטי תרומה | תורה ברורה</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800&family=Noto+Serif+Hebrew:wght@500;700;800&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="./styles.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800&amp;family=Noto+Serif+Hebrew:wght@500;700;800&amp;display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./styles.css">
     <style>
       .checkout-page {
         width: min(1180px, calc(100% - 32px));
@@ -214,17 +210,17 @@
 
 
       <div class="checkout-layout">
-        <form class="checkout-form" data-checkout-form>
+        <form class="checkout-form" data-checkout-form="">
           <section class="checkout-group" aria-label="פרטי תרומה">
             <h2>פרטי התרומה</h2>
             <div class="checkout-fields">
               <label>
                 תחום התרומה
-                <input type="text" name="category-label" readonly />
+                <input type="text" name="category-label" readonly="">
               </label>
               <label>
                 סכום התרומה
-                <input type="number" name="amount" min="1" readonly />
+                <input type="number" name="amount" min="1" readonly="">
               </label>
             </div>
           </section>
@@ -235,19 +231,19 @@
             <div class="checkout-fields">
               <label>
                 שם פרטי
-                <input type="text" name="first-name" autocomplete="given-name" required />
+                <input type="text" name="first-name" autocomplete="given-name" required="">
               </label>
               <label>
                 שם משפחה
-                <input type="text" name="last-name" autocomplete="family-name" required />
+                <input type="text" name="last-name" autocomplete="family-name" required="">
               </label>
               <label>
                 טלפון
-                <input type="tel" name="phone" autocomplete="tel" required />
+                <input type="tel" name="phone" autocomplete="tel" required="">
               </label>
               <label>
                 אימייל
-                <input type="email" name="email" autocomplete="email" required />
+                <input type="email" name="email" autocomplete="email" required="">
               </label>
             </div>
           </section>
@@ -267,7 +263,7 @@
               </label>
               <label>
                 שם להקדשה
-                <input type="text" name="dedication-name" />
+                <input type="text" name="dedication-name">
               </label>
             </div>
             <label>
@@ -283,19 +279,19 @@
             <div class="checkout-fields">
               <label>
                 מספר כרטיס
-                <input type="text" name="card-number" inputmode="numeric" autocomplete="cc-number" placeholder="0000 0000 0000 0000" />
+                <input type="text" name="card-number" inputmode="numeric" autocomplete="cc-number" placeholder="0000 0000 0000 0000">
               </label>
               <label>
                 שם בעל הכרטיס
-                <input type="text" name="card-name" autocomplete="cc-name" />
+                <input type="text" name="card-name" autocomplete="cc-name">
               </label>
               <label>
                 תוקף
-                <input type="text" name="card-expiry" inputmode="numeric" autocomplete="cc-exp" placeholder="MM/YY" />
+                <input type="text" name="card-expiry" inputmode="numeric" autocomplete="cc-exp" placeholder="MM/YY">
               </label>
               <label>
                 שלוש ספרות בגב הכרטיס
-                <input type="password" name="card-cvv" inputmode="numeric" autocomplete="cc-csc" maxlength="4" placeholder="CVV" />
+                <input type="password" name="card-cvv" inputmode="numeric" autocomplete="cc-csc" maxlength="4" placeholder="CVV">
               </label>
             </div>
           </section>
@@ -310,11 +306,11 @@
           <h2>סיכום</h2>
           <div class="summary-row">
             <span>תחום</span>
-            <strong data-summary-category>תרומה</strong>
+            <strong data-summary-category="">תרומה לכוללים</strong>
           </div>
           <div class="summary-row">
             <span>סכום</span>
-            <strong data-summary-amount>₪0</strong>
+            <strong data-summary-amount="">₪0</strong>
           </div>
           <p class="checkout-note">לאחר קבלת פרטי המסוף נחבר את הכפתור הזה לסליקה בפועל.</p>
         </aside>
@@ -389,5 +385,53 @@
         });
       }
     </script>
-  </body>
-</html>
+
+<script>
+(function () {
+  var STYLE_ID = "torah-language-style";
+  var BUTTON_CLASS = "language-toggle";
+  function cleanUrl() {
+    return window.location.origin + window.location.pathname + window.location.search + window.location.hash;
+  }
+  function translateUrl() {
+    return "https://translate.google.com/translate?sl=iw&tl=en&u=" + encodeURIComponent(cleanUrl());
+  }
+  function addLanguageButton() {
+    if (document.querySelector("." + BUTTON_CLASS)) return;
+    if (!document.getElementById(STYLE_ID)) {
+      var style = document.createElement("style");
+      style.id = STYLE_ID;
+      style.textContent = "
+.language-toggle{display:inline-flex;align-items:center;justify-content:center;min-width:46px;height:42px;padding:0 14px;border-radius:999px;border:1px solid rgba(234,212,164,.75);background:#f7f0df;color:#09182b;font-family:Arial,sans-serif;font-size:15px;font-weight:800;letter-spacing:.04em;text-decoration:none;box-shadow:0 8px 20px rgba(0,0,0,.12);transition:.2s ease;}
+.language-toggle:hover{background:#ead4a4;transform:translateY(-1px);}
+.site-header .language-toggle{justify-self:end;}
+@media(max-width:760px){.language-toggle{height:38px;min-width:42px;padding:0 12px;font-size:14px}.site-header .language-toggle{order:4}}
+";
+      document.head.appendChild(style);
+    }
+    var button = document.createElement("a");
+    button.className = BUTTON_CLASS;
+    button.href = translateUrl();
+    button.target = "_blank";
+    button.rel = "noopener";
+    button.textContent = "EN";
+    button.setAttribute("aria-label", "Translate site to English");
+    var header = document.querySelector(".site-header");
+    if (header) {
+      header.appendChild(button);
+    } else {
+      button.style.position = "fixed";
+      button.style.top = "18px";
+      button.style.left = "18px";
+      button.style.zIndex = "999";
+      document.body.appendChild(button);
+    }
+  }
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", addLanguageButton);
+  } else {
+    addLanguageButton();
+  }
+})();
+</script>
+</body><div id="codex-browser-sidebar-comments-root" style="position: fixed; inset: 0px; pointer-events: none; z-index: 2147483647;"></div></html>
