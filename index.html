@@ -1,17 +1,12 @@
-﻿<!doctype html>
-<!-- Production refresh: July 12, 2026 -->
-<html lang="he" dir="rtl">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<!doctype html>
+<html lang="he" dir="rtl"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>תורה ברורה | החלק שלך בתורת ארץ ישראל</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800&family=Noto+Serif+Hebrew:wght@500;700;800&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="./styles.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800&amp;family=Noto+Serif+Hebrew:wght@500;700;800&amp;display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./styles.css">
   </head>
   <body>
     <header class="site-header">
@@ -506,5 +501,53 @@
         <a href="./books.html">ספרים</a>
       </nav>
     </footer>
-  </body>
-</html>
+
+<script>
+(function () {
+  var STYLE_ID = "torah-language-style";
+  var BUTTON_CLASS = "language-toggle";
+  function cleanUrl() {
+    return window.location.origin + window.location.pathname + window.location.search + window.location.hash;
+  }
+  function translateUrl() {
+    return "https://translate.google.com/translate?sl=iw&tl=en&u=" + encodeURIComponent(cleanUrl());
+  }
+  function addLanguageButton() {
+    if (document.querySelector("." + BUTTON_CLASS)) return;
+    if (!document.getElementById(STYLE_ID)) {
+      var style = document.createElement("style");
+      style.id = STYLE_ID;
+      style.textContent = "
+.language-toggle{display:inline-flex;align-items:center;justify-content:center;min-width:46px;height:42px;padding:0 14px;border-radius:999px;border:1px solid rgba(234,212,164,.75);background:#f7f0df;color:#09182b;font-family:Arial,sans-serif;font-size:15px;font-weight:800;letter-spacing:.04em;text-decoration:none;box-shadow:0 8px 20px rgba(0,0,0,.12);transition:.2s ease;}
+.language-toggle:hover{background:#ead4a4;transform:translateY(-1px);}
+.site-header .language-toggle{justify-self:end;}
+@media(max-width:760px){.language-toggle{height:38px;min-width:42px;padding:0 12px;font-size:14px}.site-header .language-toggle{order:4}}
+";
+      document.head.appendChild(style);
+    }
+    var button = document.createElement("a");
+    button.className = BUTTON_CLASS;
+    button.href = translateUrl();
+    button.target = "_blank";
+    button.rel = "noopener";
+    button.textContent = "EN";
+    button.setAttribute("aria-label", "Translate site to English");
+    var header = document.querySelector(".site-header");
+    if (header) {
+      header.appendChild(button);
+    } else {
+      button.style.position = "fixed";
+      button.style.top = "18px";
+      button.style.left = "18px";
+      button.style.zIndex = "999";
+      document.body.appendChild(button);
+    }
+  }
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", addLanguageButton);
+  } else {
+    addLanguageButton();
+  }
+})();
+</script>
+</body><div id="codex-browser-sidebar-comments-root" style="position: fixed; inset: 0px; pointer-events: none; z-index: 2147483647;"></div></html>
