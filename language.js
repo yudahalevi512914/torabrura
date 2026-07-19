@@ -242,3 +242,53 @@
 })();
 
     document.querySelectorAll(".vision-actions .secondary-action").forEach(function (link) { link.remove(); });
+
+
+(function () {
+  function categoryForAmount(amount) {
+    var categories = { "180": "kollelim", "900": "settlements", "3600": "books", "7200": "aliyah" };
+    return categories[amount] || "";
+  }
+
+  function checkoutHref(amount, category) {
+    var url = new URL("./checkout.html", window.location.href);
+    if (category) url.searchParams.set("category", category);
+    if (amount) url.searchParams.set("amount", amount);
+    if (document.documentElement.lang === "en") url.searchParams.set("lang", "en");
+    return url.pathname.split("/").pop() + url.search;
+  }
+
+  function rewriteDonationLinks() {
+    document.querySelectorAll('a[href*="donation.html?amount="]').forEach(function (link) {
+      var url = new URL(link.getAttribute("href"), window.location.href);
+      var amount = url.searchParams.get("amount");
+      link.setAttribute("href", checkoutHref(amount, url.searchParams.get("category") || categoryForAmount(amount)));
+    });
+  }
+
+  document.addEventListener("click", function (event) {
+    var link = event.target.closest ? event.target.closest('a[href*="donation.html?amount="]') : null;
+    if (!link) return;
+    var url = new URL(link.getAttribute("href"), window.location.href);
+    var amount = url.searchParams.get("amount");
+    event.preventDefault();
+    window.location.href = checkoutHref(amount, url.searchParams.get("category") || categoryForAmount(amount));
+  }, true);
+
+  document.addEventListener("submit", function (event) {
+    var form = event.target;
+    if (!form || !form.matches || !form.matches("[data-custom-amount]")) return;
+    var input = form.querySelector('input[name="custom-amount"]');
+    var amount = input ? input.value : "";
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    if (!amount) {
+      if (input) input.focus();
+      return;
+    }
+    window.location.href = checkoutHref(amount, new URLSearchParams(window.location.search).get("category"));
+  }, true);
+
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", rewriteDonationLinks);
+  else rewriteDonationLinks();
+})();
