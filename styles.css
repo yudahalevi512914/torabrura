@@ -152,6 +152,45 @@ a {
   transform: translateY(-1px);
 }
 
+body[data-lang="en"] {
+  direction: ltr;
+  text-align: left;
+}
+
+body[data-lang="en"] .site-header,
+body[data-lang="en"] .top-nav,
+body[data-lang="en"] .vision-actions,
+body[data-lang="en"] .donation-grid,
+body[data-lang="en"] .amount-card,
+body[data-lang="en"] .donation-form {
+  direction: ltr;
+}
+
+body[data-lang="en"] .home-vision,
+body[data-lang="en"] .home-stats,
+body[data-lang="en"] .story-heading,
+body[data-lang="en"] .home-map-band,
+body[data-lang="en"] .home-donation-teaser,
+body[data-lang="en"] .donation-hero,
+body[data-lang="en"] .donation-choice-section,
+body[data-lang="en"] .donation-amounts {
+  text-align: center;
+}
+
+body[data-lang="en"] .story-grid,
+body[data-lang="en"] .donation-form-shell,
+body[data-lang="en"] .donation-form label,
+body[data-lang="en"] .refund-policy-box {
+  text-align: left;
+}
+
+body[data-lang="en"] input,
+body[data-lang="en"] select,
+body[data-lang="en"] textarea {
+  direction: ltr;
+  text-align: left;
+}
+
 .header-cta:hover,
 .donation-link:hover {
   background: linear-gradient(180deg, #d5ae5d 0%, var(--gold-dark) 100%);
