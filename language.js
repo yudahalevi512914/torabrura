@@ -379,3 +379,298 @@
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", initDonationFlowRestore);
   else initDonationFlowRestore();
 })();
+
+
+
+(function () {
+  var HOSTED_FIELDS_SCRIPT = "https://hf.tranzila.com/assets/js/thostedf.js";
+  var HANDSHAKE_ENDPOINT = window.TORA_BRURA_TRANZILA_HANDSHAKE_URL || "/api/tranzila-handshake";
+  var DEFAULT_TERMINAL = window.TORA_BRURA_TRANZILA_TERMINAL || "TRANZILA_TERMINAL_NAME";
+  var hostedFields = null;
+  var hostedFieldsReady = false;
+
+  function isCheckoutPage() {
+    var page = (window.location.pathname || "").split("/").pop();
+    return page === "checkout" || page === "checkout.html";
+  }
+
+  function addHostedFieldsStyles() {
+    if (document.getElementById("tranzila-hosted-fields-style")) return;
+    var style = document.createElement("style");
+    style.id = "tranzila-hosted-fields-style";
+    style.textContent = "
+.tranzila-hosted-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.tranzila-hosted-grid label{display:grid;gap:8px;color:var(--ink-deep);font-weight:800}
+.tranzila-hosted-field{width:100%;min-height:52px;padding:12px 14px;background:var(--stone-light);border:1px solid rgba(67,83,108,.24);border-radius:3px;display:flex;align-items:center}
+.tranzila-hosted-field.hosted-fields-valid{border-color:#2e7d32;background:#f4fbf4}
+.tranzila-hosted-field.hosted-fields-invalid{border-color:#b3261e;background:#fff6f5}
+.tranzila-hosted-error{min-height:18px;color:#b3261e;font-size:13px;font-weight:700}
+.tranzila-secure-note{margin:0;color:var(--ink-soft);font-size:15px;line-height:1.6;font-weight:700}
+.tranzila-status{margin:0;color:var(--gold-dark);font-weight:900}
+@media(max-width:860px){.tranzila-hosted-grid{grid-template-columns:1fr}}
+";
+    document.head.appendChild(style);
+  }
+
+  function loadHostedFieldsScript() {
+    if (window.TzlaHostedFields) return Promise.resolve();
+    var existing = document.querySelector('script[src="' + HOSTED_FIELDS_SCRIPT + '"]');
+    if (existing) {
+      return new Promise(function (resolve, reject) {
+        existing.addEventListener("load", resolve, { once: true });
+        existing.addEventListener("error", reject, { once: true });
+      });
+    }
+    return new Promise(function (resolve, reject) {
+      var script = document.createElement("script");
+      script.src = HOSTED_FIELDS_SCRIPT;
+      script.async = true;
+      script.onload = resolve;
+      script.onerror = reject;
+      document.head.appendChild(script);
+    });
+  }
+
+  function replaceCreditCardInputs() {
+    var paymentGroup = document.querySelector('.checkout-group[aria-label="פרטי אשראי"], .checkout-group[aria-label="Credit Card Details"]');
+    if (!paymentGroup || paymentGroup.dataset.tranzilaHosted === "ready") return paymentGroup;
+    paymentGroup.dataset.tranzilaHosted = "ready";
+    paymentGroup.innerHTML = [
+      '<h2>פרטי אשראי</h2>',
+      '<p class="tranzila-secure-note">שדות האשראי נטענים ישירות מחברת הסליקה Tranzila. מספר הכרטיס, התוקף וה-CVV לא נשמרים באתר ולא נשלחים ל-Google Sheets.</p>',
+      '<div class="tranzila-hosted-grid">',
+        '<label for="tranzila-card-number">מספר כרטיס<div class="tranzila-hosted-field" id="tranzila-card-number"></div><span class="tranzila-hosted-error" id="errors_for_credit_card_number"></span></label>',
+        '<label>שם בעל הכרטיס<input type="text" name="card-holder-name" autocomplete="cc-name" required></label>',
+        '<label for="tranzila-card-expiry">תוקף<div class="tranzila-hosted-field" id="tranzila-card-expiry"></div><span class="tranzila-hosted-error" id="errors_for_expiry"></span></label>',
+        '<label for="tranzila-card-cvv">שלוש ספרות בגב הכרטיס<div class="tranzila-hosted-field" id="tranzila-card-cvv"></div><span class="tranzila-hosted-error" id="errors_for_cvv"></span></label>',
+      '</div>',
+      '<p class="tranzila-status" data-tranzila-status>טוען שדות סליקה מאובטחים...</p>'
+    ].join("");
+    return paymentGroup;
+  }
+
+  function setStatus(message) {
+    var status = document.querySelector("[data-tranzila-status]");
+    if (status) status.textContent = message || "";
+  }
+
+  function setFieldError(param, message) {
+    var id = param === "number" ? "credit_card_number" : param;
+    var target = document.getElementById("errors_for_" + id);
+    if (target) target.textContent = message || "";
+  }
+
+  function clearErrors() {
+    document.querySelectorAll(".tranzila-hosted-error").forEach(function (node) {
+      node.textContent = "";
+    });
+  }
+
+  function initHostedFields() {
+    if (!window.TzlaHostedFields || hostedFields) return;
+    hostedFields = window.TzlaHostedFields.create({
+      sandbox: false,
+      fields: {
+        credit_card_number: {
+          selector: "#tranzila-card-number",
+          placeholder: "4580 4580 4580 4580",
+          tabindex: 10
+        },
+        expiry: {
+          selector: "#tranzila-card-expiry",
+          placeholder: "MM/YY",
+          version: "1",
+          tabindex: 11
+        },
+        cvv: {
+          selector: "#tranzila-card-cvv",
+          placeholder: "123",
+          tabindex: 12
+        }
+      },
+      styles: {
+        input: {
+          height: "auto",
+          width: "100%",
+          color: "#09182b",
+          "font-size": "18px",
+          "font-family": "Heebo, Arial, sans-serif"
+        },
+        select: {
+          height: "auto",
+          width: "100%",
+          color: "#09182b",
+          "font-size": "18px",
+          "font-family": "Heebo, Arial, sans-serif"
+        }
+      }
+    });
+
+    if (hostedFields.onEvent) {
+      hostedFields.onEvent("ready", function () {
+        hostedFieldsReady = true;
+        setStatus("השדות המאובטחים מוכנים לתשלום.");
+      });
+      hostedFields.onEvent("validityChange", function (event) {
+        if (!event || !event.field) return;
+        setFieldError(event.field, event.isValid ? "" : "נא לבדוק את השדה");
+      });
+      hostedFields.onEvent("submit", function () {
+        var form = document.querySelector("[data-checkout-form]");
+        if (form) requestTranzilaCharge(form);
+      });
+    } else {
+      hostedFieldsReady = true;
+      setStatus("השדות המאובטחים מוכנים לתשלום.");
+    }
+  }
+
+  function donationDataFromForm(form) {
+    var params = new URLSearchParams(window.location.search);
+    var amount = form.elements.amount ? form.elements.amount.value : params.get("amount") || "";
+    var firstName = form.elements["first-name"] ? form.elements["first-name"].value.trim() : "";
+    var lastName = form.elements["last-name"] ? form.elements["last-name"].value.trim() : "";
+    var phone = form.elements.phone ? form.elements.phone.value.trim() : "";
+    var email = form.elements.email ? form.elements.email.value.trim() : "";
+    return {
+      submittedAt: new Date().toLocaleString("he-IL"),
+      category: form.elements["category-label"] ? form.elements["category-label"].value : "תרומה",
+      categoryKey: params.get("category") || "kollelim",
+      amount: amount,
+      firstName: firstName,
+      lastName: lastName,
+      phone: phone,
+      email: email,
+      dedicationType: form.elements["dedication-type"] ? form.elements["dedication-type"].value : "",
+      dedicationName: form.elements["dedication-name"] ? form.elements["dedication-name"].value : "",
+      notes: form.elements.notes ? form.elements.notes.value : "",
+      cardHolderName: form.elements["card-holder-name"] ? form.elements["card-holder-name"].value.trim() : (firstName + " " + lastName).trim(),
+      source: "torabrura.vercel.app"
+    };
+  }
+
+  function saveDonationToSheets(data, tranzilaResponse) {
+    var sheetsUrl = window.TORA_BRURA_GOOGLE_SHEETS_URL || "";
+    if (!sheetsUrl) return Promise.resolve();
+    var payload = Object.assign({}, data, {
+      paymentStatus: "paid",
+      tranzilaTransactionId: tranzilaResponse && tranzilaResponse.transaction_response ? tranzilaResponse.transaction_response.transaction_id || "" : "",
+      cardLast4: tranzilaResponse && tranzilaResponse.transaction_response ? tranzilaResponse.transaction_response.credit_card_last_4_digits || "" : ""
+    });
+    return fetch(sheetsUrl, {
+      method: "POST",
+      mode: "no-cors",
+      body: new URLSearchParams(payload)
+    }).catch(function () {});
+  }
+
+  function createHandshake(data) {
+    return fetch(HANDSHAKE_ENDPOINT, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        amount: data.amount,
+        category: data.categoryKey,
+        contact: (data.firstName + " " + data.lastName).trim(),
+        email: data.email,
+        phone: data.phone
+      })
+    }).then(function (response) {
+      return response.json().then(function (body) {
+        if (!response.ok || !body.thtk) throw new Error(body.error || "חסר token מאובטח של Tranzila");
+        return body;
+      });
+    });
+  }
+
+  function chargeWithTranzila(data, handshake) {
+    return new Promise(function (resolve, reject) {
+      hostedFields.charge({
+        terminal_name: handshake.terminal_name || DEFAULT_TERMINAL,
+        amount: data.amount,
+        currency_code: "ILS",
+        tran_mode: "A",
+        response_language: document.documentElement.lang === "en" ? "english" : "hebrew",
+        thtk: handshake.thtk,
+        contact: (data.firstName + " " + data.lastName).trim(),
+        email: data.email,
+        phone: data.phone,
+        card_holder_name: data.cardHolderName,
+        card_holder_email: data.email,
+        phone_country_code: "+972",
+        phone_number: data.phone,
+        pdesc: data.category + (data.dedicationName ? " - " + data.dedicationName : "")
+      }, function (err, response) {
+        if (err) return reject(err);
+        resolve(response);
+      });
+    });
+  }
+
+  async function requestTranzilaCharge(form) {
+    clearErrors();
+    if (!hostedFields || !hostedFieldsReady) {
+      alert("שדות הסליקה עדיין נטענים. נסו שוב בעוד רגע.");
+      return;
+    }
+    if (!form.reportValidity()) return;
+
+    var button = form.querySelector(".checkout-submit");
+    var originalText = button ? button.textContent : "";
+    var data = donationDataFromForm(form);
+    if (button) {
+      button.disabled = true;
+      button.textContent = "מבצע תשלום מאובטח...";
+    }
+    setStatus("יוצר אישור מאובטח מול Tranzila...");
+
+    try {
+      var handshake = await createHandshake(data);
+      setStatus("שולח לחברת הסליקה...");
+      var tranzilaResponse = await chargeWithTranzila(data, handshake);
+      await saveDonationToSheets(data, tranzilaResponse);
+      setStatus("התרומה נקלטה בהצלחה. תודה רבה!");
+      alert("התרומה נקלטה בהצלחה. תודה רבה!");
+    } catch (error) {
+      if (error && error.messages) {
+        error.messages.forEach(function (message) {
+          setFieldError(message.param, message.message);
+        });
+      }
+      setStatus("לא הצלחנו להשלים את התשלום. בדקו את הפרטים או נסו שוב.");
+      alert((error && error.message) || "לא הצלחנו להשלים את התשלום כרגע.");
+    } finally {
+      if (button) {
+        button.disabled = false;
+        button.textContent = originalText;
+      }
+    }
+  }
+
+  function wireCheckoutSubmit() {
+    var form = document.querySelector("[data-checkout-form]");
+    if (!form || form.dataset.tranzilaSubmit === "ready") return;
+    form.dataset.tranzilaSubmit = "ready";
+    form.addEventListener("submit", function (event) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      requestTranzilaCharge(form);
+    }, true);
+  }
+
+  async function initTranzilaHostedFields() {
+    if (!isCheckoutPage()) return;
+    addHostedFieldsStyles();
+    replaceCreditCardInputs();
+    wireCheckoutSubmit();
+    try {
+      await loadHostedFieldsScript();
+      initHostedFields();
+    } catch (error) {
+      setStatus("לא הצלחנו לטעון את שדות הסליקה המאובטחים של Tranzila.");
+    }
+  }
+
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", initTranzilaHostedFields);
+  else initTranzilaHostedFields();
+})();
