@@ -10,7 +10,7 @@
       href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800&family=Noto+Serif+Hebrew:wght@500;700;800&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./styles.css?v=kollelim-inline-20260719" />
+    <link rel="stylesheet" href="./styles.css?v=language-fix-20260719" />
 
     <style>
       .refund-policy-box {
@@ -53,6 +53,7 @@
         <a href="./books.html">ספרים</a>
       </nav>
       <a class="header-cta" href="./index.html">חזרה לעמוד הראשי</a>
+      <a class="language-toggle" data-language-toggle href="https://translate.google.com/translate?sl=iw&tl=en&u=https%3A%2F%2Ftorabrura.vercel.app%2Fdonation" target="_blank" rel="noopener" aria-label="Translate site to English">EN</a>
     </header>
 
     <main class="donation-page">
@@ -197,6 +198,12 @@
           }
           window.location.href = "./donation.html?amount=" + encodeURIComponent(customAmount) + "#amounts";
         });
+      }
+      var languageToggle = document.querySelector("[data-language-toggle]");
+      if (languageToggle) {
+        languageToggle.href =
+          "https://translate.google.com/translate?sl=iw&tl=en&u=" +
+          encodeURIComponent(window.location.origin + window.location.pathname + window.location.search + window.location.hash);
       }
     </script>
   </body>
