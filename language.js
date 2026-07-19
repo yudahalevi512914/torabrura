@@ -188,8 +188,15 @@
     });
   }
 
+  function removeUnusedDonationButton() {
+    document.querySelectorAll(".vision-actions .secondary-action").forEach(function (link) {
+      link.remove();
+    });
+  }
+
   function setLanguage(lang) {
     var isEnglish = lang === "en";
+    removeUnusedDonationButton();
     document.documentElement.lang = isEnglish ? "en" : "he";
     document.documentElement.dir = isEnglish ? "ltr" : "rtl";
     document.body.setAttribute("data-lang", lang);
@@ -233,3 +240,5 @@
     initLanguage();
   }
 })();
+
+    document.querySelectorAll(".vision-actions .secondary-action").forEach(function (link) { link.remove(); });
