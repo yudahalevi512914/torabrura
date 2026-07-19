@@ -10,55 +10,12 @@
       href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800&family=Noto+Serif+Hebrew:wght@500;700;800&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./styles.css" />
-    <style>
-      .news-page {
-        display: grid;
-        place-items: center;
-        padding: 96px 24px;
-      }
-
-      .news-feature-card {
-        width: min(980px, 100%);
-        padding: clamp(32px, 5vw, 62px);
-        color: var(--ink);
-        background:
-          linear-gradient(135deg, rgba(255, 255, 255, 0.94), rgba(248, 244, 234, 0.9)),
-          var(--stone-light);
-        border: 1px solid rgba(197, 154, 70, 0.34);
-        border-radius: 8px;
-        box-shadow: var(--shadow);
-      }
-
-      .news-feature-card span {
-        display: inline-flex;
-        margin-bottom: 16px;
-        color: var(--gold-dark);
-        font-size: 18px;
-        font-weight: 800;
-      }
-
-      .news-feature-card h1 {
-        margin: 0 0 22px;
-        font-family: "Noto Serif Hebrew", serif;
-        font-size: clamp(34px, 5vw, 58px);
-        line-height: 1.14;
-      }
-
-      .news-feature-card p {
-        max-width: 860px;
-        margin: 0;
-        color: var(--ink-soft);
-        font-size: clamp(20px, 2.3vw, 27px);
-        font-weight: 500;
-        line-height: 1.75;
-      }
-    </style>
+    <link rel="stylesheet" href="./styles.css?v=language-site-20260719" />
   </head>
   <body>
     <header class="site-header">
       <a class="logo" href="./index.html" aria-label="תורה ברורה">
-        <span class="logo-mark" aria-hidden="true"></span>
+        <span class="logo-mark"><img src="./assets/logo.png" alt="" /></span>
         <span class="logo-text">תורה ברורה</span>
       </a>
       <nav class="top-nav" aria-label="ניווט ראשי">
@@ -70,16 +27,7 @@
         <a href="./books.html">ספרים</a>
       </nav>
     </header>
-    <main class="page-shell news-page" aria-label="מה חדש">
-      <section class="news-feature-card">
-        <span>מה חדש</span>
-        <h1>כולל הערב החדש בעוז ציון</h1>
-        <p>
-          מתוך השאיפה להרחיב את גבולות הקדושה וההתיישבות, אנו זוכים לראות את הפירות המופלאים של כולל הערב החדש שהקמנו ביישוב עוז ציון. המקום, שהחל כחזון, הפך למרכז רוחני שוקק חיים ותוסס, שבו עשרות אברכים ותושבים מקומיים גודשים את ספסלי בית המדרש מדי ערב ומעמיקים בלימוד התורה. קול התורה המהדהד בעוז ציון בשעות המאוחרות לא רק שמחזק את הלומדים עצמם, אלא מקרין אור רוחני גדול על היישוב כולו, ומחבר בין עומק התורה לבין אחיזתנו האיתנה בשטח.
-        </p>
-      </section>
-    </main>
+    <main class="page-shell" aria-label="מה חדש"></main>
+    <script src="./language.js?v=language-site-20260719"></script>
   </body>
 </html>
-
-
