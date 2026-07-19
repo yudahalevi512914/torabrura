@@ -1,11 +1,11 @@
-export default async function handler(request, response) {
+module.exports = async function handler(request, response) {
   if (request.method !== "POST") {
     response.setHeader("Allow", "POST");
     return response.status(405).json({ error: "Method not allowed" });
   }
 
   try {
-    const { amount } = request.body || {};
+    const amount = request.body && request.body.amount;
     const terminalName = process.env.TRANZILA_TERMINAL_NAME;
     const appKey = process.env.TRANZILA_APP_KEY;
     const secret = process.env.TRANZILA_SECRET;
@@ -26,10 +26,11 @@ export default async function handler(request, response) {
       return response.status(400).json({ error: "Invalid donation amount" });
     }
 
-    const { createHmac, randomBytes } = await import("node:crypto");
+    const crypto = require("crypto");
     const requestTime = Math.floor(Date.now() / 1000).toString();
-    const nonce = randomBytes(40).toString("hex").slice(0, 40);
-    const accessToken = createHmac("sha256", secret + requestTime + nonce)
+    const nonce = crypto.randomBytes(40).toString("hex").slice(0, 40);
+    const accessToken = crypto
+      .createHmac("sha256", secret + requestTime + nonce)
       .update(appKey)
       .digest("hex");
 
@@ -48,7 +49,7 @@ export default async function handler(request, response) {
       })
     });
 
-    const data = await tranzilaResponse.json().catch(() => ({}));
+    const data = await tranzilaResponse.json().catch(function () { return {}; });
     if (!tranzilaResponse.ok || data.error_code) {
       return response.status(502).json({ error: "Failed to create Tranzila handshake", details: data });
     }
@@ -60,4 +61,4 @@ export default async function handler(request, response) {
   } catch (error) {
     return response.status(500).json({ error: "Unexpected Tranzila handshake error" });
   }
-}
+};
