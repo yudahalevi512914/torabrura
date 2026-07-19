@@ -292,3 +292,90 @@
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", rewriteDonationLinks);
   else rewriteDonationLinks();
 })();
+
+
+
+(function () {
+  var cardCategories = ["kollelim", "settlements", "books", "aliyah"];
+  var amountCategories = { "180": "kollelim", "900": "settlements", "3600": "books", "7200": "aliyah" };
+
+  function pageName(pathname) {
+    return (pathname || "").split("/").pop() || "index.html";
+  }
+
+  function isDonationPage() {
+    var page = pageName(window.location.pathname);
+    return page === "donation" || page === "donation.html";
+  }
+
+  function withLang(url) {
+    if (document.documentElement.lang === "en") url.searchParams.set("lang", "en");
+    return url.pathname.split("/").pop() + url.search + url.hash;
+  }
+
+  function checkoutHref(amount, category) {
+    var url = new URL("./checkout.html", window.location.href);
+    if (category) url.searchParams.set("category", category);
+    if (amount) url.searchParams.set("amount", amount);
+    return withLang(url);
+  }
+
+  function donationAmountsHref(category) {
+    var url = new URL("./donation.html", window.location.href);
+    if (category) url.searchParams.set("category", category);
+    url.hash = "amounts";
+    return withLang(url);
+  }
+
+  function selectedCategory() {
+    return new URLSearchParams(window.location.search).get("category") || "";
+  }
+
+  function restoreDonationCategoryButtons() {
+    document.querySelectorAll(".donation-choice-section .donation-link").forEach(function (link, index) {
+      link.setAttribute("href", donationAmountsHref(cardCategories[index] || "kollelim"));
+    });
+  }
+
+  function routeAmountCardsToCheckout() {
+    var category = selectedCategory();
+    document.querySelectorAll(".donation-amounts a.amount-card").forEach(function (link) {
+      var original = new URL(link.getAttribute("href"), window.location.href);
+      var amount = original.searchParams.get("amount");
+      link.setAttribute("href", checkoutHref(amount, category || amountCategories[amount] || ""));
+    });
+  }
+
+  function showAmountsForCategory() {
+    if (!isDonationPage() || !selectedCategory()) return;
+    document.querySelectorAll(".donation-flow").forEach(function (section) {
+      section.hidden = false;
+    });
+    var choiceSection = document.querySelector(".donation-choice-section");
+    if (choiceSection) choiceSection.hidden = true;
+    document.body.classList.add("amount-selected");
+  }
+
+  function initDonationFlowRestore() {
+    restoreDonationCategoryButtons();
+    routeAmountCardsToCheckout();
+    showAmountsForCategory();
+  }
+
+  document.addEventListener("submit", function (event) {
+    var form = event.target;
+    if (!form || !form.matches || !form.matches("[data-custom-amount]")) return;
+    var input = form.querySelector('input[name="custom-amount"]');
+    var amount = input ? input.value : "";
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    if (!amount) {
+      if (input) input.focus();
+      return;
+    }
+    window.location.href = checkoutHref(amount, selectedCategory());
+  }, true);
+
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", initDonationFlowRestore);
+  else initDonationFlowRestore();
+})();
