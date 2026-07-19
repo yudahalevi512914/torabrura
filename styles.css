@@ -127,6 +127,31 @@ a {
   font-weight: 800;
 }
 
+.language-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 46px;
+  height: 42px;
+  padding: 0 14px;
+  color: var(--ink-deep);
+  background: #f7f0df;
+  border: 1px solid rgba(234, 212, 164, 0.75);
+  border-radius: 999px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  font-family: Arial, sans-serif;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+  transition: 0.2s ease;
+}
+
+.language-toggle:hover {
+  background: var(--gold-light);
+  transform: translateY(-1px);
+}
+
 .header-cta:hover,
 .donation-link:hover {
   background: linear-gradient(180deg, #d5ae5d 0%, var(--gold-dark) 100%);
