@@ -1006,7 +1006,7 @@ body.amount-selected .donation-amounts {
 }
 
 body.amount-selected .donation-form-shell {
-  display: block;
+  display: none;
 }
 
 .donation-form {
