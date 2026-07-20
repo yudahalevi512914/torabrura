@@ -70,47 +70,47 @@
             <div class="card-overlay">
               <p>שותפות בלימוד</p>
               <h3>תרומה לכוללים</h3>
-              <a class="donation-link" href="./donation.html?amount=180#amounts">לתרומה</a>
+              <a class="donation-link" href="./donation.html?category=kollelim#amounts">לתרומה</a>
             </div>
           </article>
           <article class="donation-card card-settlements">
             <div class="card-overlay">
               <p>בניין וחיזוק</p>
               <h3>תרומה ליישוב הארץ</h3>
-              <a class="donation-link" href="./donation.html?amount=900#amounts">לתרומה</a>
+              <a class="donation-link" href="./donation.html?category=settlements#amounts">לתרומה</a>
             </div>
           </article>
           <article class="donation-card card-books">
             <div class="card-overlay">
               <p>הפצת תורה</p>
               <h3>הוצאת ספרים</h3>
-              <a class="donation-link" href="./donation.html?amount=3600#amounts">לתרומה</a>
+              <a class="donation-link" href="./donation.html?category=books#amounts">לתרומה</a>
             </div>
           </article>
           <article class="donation-card card-aliyah">
             <div class="card-overlay">
               <p>תורה בארץ</p>
               <h3>חיזוק העלייה לארץ</h3>
-              <a class="donation-link" href="./donation.html?amount=7200#amounts">לתרומה</a>
+              <a class="donation-link" href="./donation.html?category=aliyah#amounts">לתרומה</a>
             </div>
           </article>
         </div>
       </section>
 
       <section id="amounts" class="donation-amounts donation-flow" aria-label="בחירת סכום תרומה">
-        <a href="./donation.html?amount=180" class="amount-card">
+        <a href="./checkout.html?amount=180" class="amount-card">
           <span>שעת לימוד</span>
           <strong>₪180</strong>
         </a>
-        <a href="./donation.html?amount=900" class="amount-card">
+        <a href="./checkout.html?amount=900" class="amount-card">
           <span>סדר לימוד</span>
           <strong>₪900</strong>
         </a>
-        <a href="./donation.html?amount=3600" class="amount-card">
+        <a href="./checkout.html?amount=3600" class="amount-card">
           <span>יום לימוד</span>
           <strong>₪3,600</strong>
         </a>
-        <a href="./donation.html?amount=7200" class="amount-card">
+        <a href="./checkout.html?amount=7200" class="amount-card">
           <span>שותפות חודשית</span>
           <strong>₪7,200</strong>
         </a>
@@ -171,15 +171,16 @@
     <script>
       var params = new URLSearchParams(window.location.search);
       var amount = params.get("amount");
+      var category = params.get("category");
       var amountInput = document.querySelector('input[name="amount"]');
       var flowSections = document.querySelectorAll(".donation-flow");
       var choiceSection = document.querySelector(".donation-choice-section");
-      if (!amount) {
+      if (!amount && !category) {
         flowSections.forEach((section) => {
           section.hidden = true;
         });
       }
-      if (amount && choiceSection) {
+      if ((amount || category) && choiceSection) {
         document.body.classList.add("amount-selected");
         choiceSection.hidden = true;
       }
@@ -196,7 +197,11 @@
             customInput.focus();
             return;
           }
-          window.location.href = "./donation.html?amount=" + encodeURIComponent(customAmount) + "#amounts";
+          var checkoutUrl = new URL("./checkout.html", window.location.href);
+          if (category) checkoutUrl.searchParams.set("category", category);
+          checkoutUrl.searchParams.set("amount", customAmount);
+          if (document.documentElement.lang === "en") checkoutUrl.searchParams.set("lang", "en");
+          window.location.href = checkoutUrl.pathname.split("/").pop() + checkoutUrl.search;
         });
       }
       var languageToggle = document.querySelector("[data-language-toggle]");
