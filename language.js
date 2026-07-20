@@ -188,6 +188,61 @@
     });
   }
 
+  function categoryForAmount(amount) {
+    var categories = {
+      "180": "kollelim",
+      "900": "settlements",
+      "3600": "books",
+      "7200": "aliyah"
+    };
+    return categories[amount] || "";
+  }
+
+  function checkoutHref(amount, category) {
+    var url = new URL("./checkout.html", window.location.href);
+    if (category) url.searchParams.set("category", category);
+    if (amount) url.searchParams.set("amount", amount);
+    if (document.documentElement.lang === "en") url.searchParams.set("lang", "en");
+    return url.pathname.split("/").pop() + url.search;
+  }
+
+  function redirectDonationAmountLinks() {
+    document.querySelectorAll('a[href*="donation.html?amount="]').forEach(function (link) {
+      var url = new URL(link.getAttribute("href"), window.location.href);
+      var amount = url.searchParams.get("amount");
+      var category = url.searchParams.get("category") || categoryForAmount(amount);
+      link.setAttribute("href", checkoutHref(amount, category));
+    });
+  }
+
+  function initDonationCheckoutRouting() {
+    if (document.__donationCheckoutRouting) return;
+    document.__donationCheckoutRouting = true;
+
+    document.addEventListener("click", function (event) {
+      var link = event.target.closest ? event.target.closest('a[href*="donation.html?amount="]') : null;
+      if (!link) return;
+      var url = new URL(link.getAttribute("href"), window.location.href);
+      var amount = url.searchParams.get("amount");
+      event.preventDefault();
+      window.location.href = checkoutHref(amount, url.searchParams.get("category") || categoryForAmount(amount));
+    }, true);
+
+    document.addEventListener("submit", function (event) {
+      var form = event.target;
+      if (!form || !form.matches || !form.matches("[data-custom-amount]")) return;
+      var input = form.querySelector('input[name="custom-amount"]');
+      var amount = input ? input.value : "";
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      if (!amount) {
+        if (input) input.focus();
+        return;
+      }
+      window.location.href = checkoutHref(amount, new URLSearchParams(window.location.search).get("category"));
+    }, true);
+  }
+
   function removeUnusedDonationButton() {
     document.querySelectorAll(".vision-actions .secondary-action").forEach(function (link) {
       link.remove();
@@ -210,6 +265,7 @@
     button.textContent = isEnglish ? "HE" : "EN";
     button.setAttribute("aria-label", isEnglish ? "Switch site to Hebrew" : "Switch site to English");
     updateInternalLinks(lang);
+    redirectDonationAmountLinks();
     try {
       localStorage.setItem(STORAGE_KEY, lang);
     } catch (error) {}
@@ -226,6 +282,7 @@
   }
 
   function initLanguage() {
+    initDonationCheckoutRouting();
     var button = ensureButton();
     button.addEventListener("click", function (event) {
       event.preventDefault();
@@ -241,436 +298,218 @@
   }
 })();
 
-    document.querySelectorAll(".vision-actions .secondary-action").forEach(function (link) { link.remove(); });
-
 
 (function () {
-  function categoryForAmount(amount) {
-    var categories = { "180": "kollelim", "900": "settlements", "3600": "books", "7200": "aliyah" };
-    return categories[amount] || "";
+  var COPY = {
+    "Join Us in the Torah of the Land of Israel": "Become a partner in Torah rooted in the Land of Israel",
+    "Together we strengthen Torah learners, kollelim, classes, and the publication of sacred books in the Land of Israel.": "Together, we strengthen Torah learning, kollelim, classes, and sacred publishing across the Land of Israel.",
+    "The Vision": "Our Vision",
+    "A home page presenting the path, vision, and activity, leading onward to the partnership page.": "Discover the vision, the roots, and the work of Torah Brura, then continue to become a partner.",
+    "Our Vision: Building the Future of the People of Israel in Their Land": "Our Vision: Building the next chapter of Am Yisrael in its land",
+    "The Torah Brura organization acts from a deep belief that the future and flourishing of the People of Israel are bound to the eternal connection between Torah, settlement, and aliyah.": "Torah Brura is built on a deep belief: the future of Am Yisrael is bound to the living bond between Torah, settlement, and aliyah.",
+    "We seek to grow creative spiritual leadership through Torah Brura's network of kollelim: a complete Torah world rooted in a worldview that connects the depth of Torah with the needs of the generation and practical life. From the strength of this Torah, we go out into the field to build and expand the borders of our land through new and vibrant communities. At the same time, we extend a warm and guiding hand to our brothers and sisters in the Diaspora and help them come home to the Land of Israel.": "Through Torah Brura's network of kollelim, we are growing creative spiritual leadership: a living Torah world that connects the depth of study with the needs of this generation and the realities of life. From that Torah, we move into the field to build new, vibrant communities across the Land of Israel. At the same time, we extend a warm hand to Jews in the Diaspora and help them make their way home to Israel.",
+    "Together, we fulfill the Torah-Zionist vision and connect Torah, pioneering spirit, and the ingathering of exiles to build the People of Israel in the Land of Israel.": "Together, we are bringing the Torah-Zionist vision to life: Torah, pioneering spirit, and the ingathering of exiles, all joined in building Am Yisrael in Eretz Yisrael.",
+    "Torah Brura: A World of Kollelim": "Torah Brura: A living world of kollelim",
+    "Torah is the spiritual engine and moral compass of the organization. We establish and operate a network of kollelim that creates a deep and complete Torah world. Our kollelim are not only places of study, but also a greenhouse for Torah scholars and spiritual leadership connected to the needs of the generation, practical life, and the values of the People of Israel.": "Torah is the spiritual engine and moral compass of the organization. We establish and operate a network of kollelim that creates a deep, serious Torah world. These kollelim are more than places of learning. They are a home for growing Torah scholars and spiritual leadership that is connected to the needs of the generation, to real life, and to the values of Am Yisrael.",
+    "Settlement: Building and Deepening Roots": "Settlement: Building roots on the land",
+    "From the strength of Torah and the connection to the land, we go out into the field to create blessed facts on the ground. The organization seeks to establish and develop new, vibrant communities throughout the country, with a pioneering vision of expanding settlement, strengthening our hold on the land, and bringing growth and life to every part of our land.": "From the strength of Torah and our bond with the land, we move from vision to action. Torah Brura works to establish and develop new, vibrant communities throughout Israel, with a pioneering spirit that expands settlement, strengthens our hold on the land, and brings life and growth to every part of our country.",
+    "Aliyah: Gathering Exiles and Bringing Them Home": "Aliyah: Bringing our people home",
+    "The return to Zion and the ingathering of Israel are among the central missions of our generation. Torah Brura sees the aliyah of Jews from the Diaspora as a supreme value, and works actively to open doors, offer a warm guiding hand, and help every oleh through the process of aliyah and absorption, so that together we can build our shared future in the Land of Israel.": "The return to Zion and the ingathering of Israel are central missions of our generation. Torah Brura sees aliyah from the Diaspora as a sacred calling. We work to open doors, offer a warm hand, and accompany every oleh through aliyah and absorption, so that together we can build our shared future in Israel.",
+    "Torah Brura grows from the world of Torah, which is the foundation and compass for all our work. From the strength of Torah, we are connected to the merit of our forefathers and to our eternal right to the land, understanding that Torah study is the root from which we are called to go out and make an impact in the practical arenas of our generation.": "Torah Brura grows from the world of Torah. Torah is the foundation and compass of everything we do. Through Torah, we connect to the merit of our fathers and to our eternal right to the land. We believe Torah study is the root from which we are called to step into the practical challenges of our generation.",
+    "The fruits of Torah Brura are the living result of combining Torah study with action in the field. They are visible wherever we work: in the network of kollelim that grows Torah scholars and spiritual leadership for the community, in new homes and families settling the communities we establish, and in new immigrants who receive warm absorption and now put down deep roots in the Land of Israel.": "The fruits of Torah Brura can be seen wherever Torah meets action: in kollelim that grow Torah scholars and community leadership, in new homes and families settling the communities we help establish, and in olim who are welcomed warmly and begin putting down deep roots in the Land of Israel.",
+    "The Strength: Torah, Pioneering Spirit, and Ingathering of Exiles": "Our Strength: Torah, pioneering spirit, and the ingathering of exiles",
+    "The unique strength of Torah Brura lies in the ability to act at full force in three critical areas at once, with Torah always at the center and the source of all our strength. From the depth of Torah and the great spirit of our kollelim, we go into the field to build new communities, while also leading meaningful efforts in the ingathering of exiles and aliyah absorption.": "Torah Brura's unique strength is the ability to work with full force in three essential areas at once, while Torah remains the center and source of our strength. From the depth and spirit of our kollelim, we move outward to build new communities and lead meaningful efforts in aliyah and absorption.",
+    "This practical combination, in which Torah gives spirit to the communities, the communities welcome and embrace new immigrants, and the immigrants join in building the land and its spirit, turns Torah Brura's vision into a living, complete reality that changes reality every day.": "This living combination gives the vision its power: Torah gives spirit to the communities, the communities welcome and embrace new olim, and the olim become part of building the land and its spirit. That is how Torah Brura turns vision into a living reality, day by day.",
+    "Action: Building the Land in Spirit and Deed": "Our Work: Building the land in spirit and action",
+    "The activity of Torah Brura translates the spiritual vision into concrete action in the field. From the beating heart of the beit midrash, we act through three central paths that change reality in our generation:": "Torah Brura turns spiritual vision into real action on the ground. From the living heart of the beit midrash, we work through three central paths that are shaping our generation:",
+    "Establishing a Network of Kollelim and Study Halls": "Building a network of kollelim and batei midrash",
+    "We found and operate kollelim that serve as spiritual and communal lighthouses. Our study halls combine deep, serious Torah learning with social involvement, growing Torah leadership connected to the field and to the needs of the hour.": "We establish and operate kollelim that serve as spiritual and communal anchors. Our batei midrash combine deep, serious Torah learning with social responsibility, growing Torah leadership that is connected to the field and to the needs of the hour.",
+    "Developing and Expanding Settlement": "Developing and expanding Jewish settlement",
+    "We actively work to establish new points of settlement and strengthen existing communities. The organization accompanies groups and families from planning through settling the land, with the aim of expanding settlement and strengthening our hold on the land.": "We actively work to establish new communities and strengthen settlement. Torah Brura accompanies groups and families from planning through going up to the land, with the goal of expanding settlement and strengthening our bond with the Land of Israel.",
+    "Absorbing and Accompanying New Immigrants": "Welcoming and accompanying new olim",
+    "We lead accompaniment programs for families from the Diaspora during their aliyah and integration in Israel. Our work includes material and spiritual support, warm communities, and help through every stage of acclimation, enabling immigrants to put down real roots in their new home.": "We lead support programs for families from the Diaspora as they make aliyah and build their lives in Israel. Our work includes practical and spiritual support, warm communities, and guidance through each stage of acclimation, so new olim can put down true roots in their new home.",
+    "On the Map": "On the Map",
+    "Kollelim, classes, and books of Torah Brura": "Torah Brura's kollelim, classes, and sacred books",
+    "Want to be part of the Torah of the Land of Israel?": "Ready to take part in Torah rooted in the Land of Israel?",
+    "Choose Your Donation": "Choose your donation",
+    "Your merit in Torah study in the Land of Israel": "Your partnership in Torah learning in the Land of Israel",
+    "Choose Your Partnership": "Choose your partnership",
+    "Donation to Kollelim": "Support the kollelim",
+    "Donation for Settling the Land": "Support settling the land",
+    "Publishing Sacred Books": "Publish sacred Torah books",
+    "Strengthening Aliyah to Israel": "Strengthen aliyah to Israel",
+    "Donate": "Donate",
+    "Hour of Study": "An hour of Torah learning",
+    "Study Session": "A full study session",
+    "Day of Study": "A day of Torah learning",
+    "Monthly Partnership": "Monthly partnership",
+    "Custom Amount": "Choose your own amount",
+    "Choose": "Select",
+    "Personal Details": "Personal details",
+    "First Name": "First name",
+    "Last Name": "Last name",
+    "Phone": "Phone",
+    "Email": "Email",
+    "Dedication": "Dedication",
+    "Dedication Type": "Dedication type",
+    "In Honor Of": "In honor of",
+    "In Memory Of": "In memory of",
+    "For Healing": "For a full recovery",
+    "For Success": "For success",
+    "Dedication Name": "Name for dedication",
+    "Payment": "Payment",
+    "Donation Amount": "Donation amount",
+    "Continue to Donation": "Continue securely",
+    "Donation Refund Cancellation File": "Donation refund cancellation document",
+    "Enter amount": "Enter an amount",
+    "Custom donation amount": "Custom donation amount",
+    "Choose donation category": "Choose a donation category",
+    "Choose donation amount": "Choose a donation amount",
+    "Donation Details": "Donation details",
+    "Complete Your Donation": "Complete your donation",
+    "Fill in your details and continue to donation": "Fill in your details and continue securely",
+    "Donation Category": "Donation category",
+    "Additional Notes": "Additional notes",
+    "You may add a request or note for the donation": "You may add a request, dedication, or note",
+    "Credit Card Details": "Credit card details",
+    "This area is ready to connect to the payment terminal. During integration we will replace these fields or connect them to the secure token/payment terminal of the clearing company, without storing card details on the site.": "Payment is handled through secure fields. Credit card details are not stored on the site and are not sent to Google Sheets.",
+    "Card Number": "Card number",
+    "Cardholder Name": "Cardholder name",
+    "Expiry": "Expiration date",
+    "CVV": "CVV",
+    "After Google Sheets is connected, the details will be saved automatically in the sheet. Credit card details are not saved in the sheet.": "Donation details are saved for follow-up and records. Credit card details are never saved in the sheet.",
+    "Summary": "Summary",
+    "Category": "Category",
+    "Amount": "Amount",
+    "After receiving the terminal details, we will connect this button to real payment processing.": "The payment will be processed securely through the connected clearing terminal.",
+    "Main navigation": "Main navigation",
+    "Secure payment fields are loading...": "Loading secure payment fields...",
+    "Secure fields are ready for payment.": "Secure payment fields are ready.",
+    "Creating a secure approval with Tranzila...": "Creating a secure payment session...",
+    "Sending to the clearing company...": "Sending payment securely...",
+    "The donation was received successfully. Thank you very much!": "Your donation was received successfully. Thank you very much!",
+    "We could not complete the payment. Please check the details or try again.": "We could not complete the payment. Please check the details and try again.",
+
+    "בואו להיות שותפים בתורת ארץ ישראל": "Become a partner in Torah rooted in the Land of Israel",
+    "יחד מחזקים לומדי תורה, כוללים, שיעורים והפצת ספרים בארץ ישראל.": "Together, we strengthen Torah learning, kollelim, classes, and sacred publishing across the Land of Israel.",
+    "הישיבה": "Our Vision",
+    "החזון": "Vision",
+    "החזון שלנו: בונים את קומת העתיד של עם ישראל בארצו": "Our Vision: Building the next chapter of Am Yisrael in its land",
+    "היסודות": "Foundations",
+    "השורשים": "Roots",
+    "הפירות": "Fruits",
+    "העוצמה": "Strength",
+    "העשייה": "Action",
+    "תרומה לכוללים": "Support the kollelim",
+    "תרומה ליישוב הארץ": "Support settling the land",
+    "הוצאת ספרי קודש": "Publish sacred Torah books",
+    "חיזוק העלייה לארץ": "Strengthen aliyah to Israel",
+    "פרטי אשראי": "Credit card details",
+    "המשך לתרומה": "Continue securely",
+    "מבצע תשלום מאובטח...": "Processing secure payment...",
+    "טוען שדות סליקה מאובטחים...": "Loading secure payment fields...",
+    "השדות המאובטחים מוכנים לתשלום.": "Secure payment fields are ready.",
+    "יוצר אישור מאובטח מול Tranzila...": "Creating a secure payment session...",
+    "שולח לחברת הסליקה...": "Sending payment securely...",
+    "התרומה נקלטה בהצלחה. תודה רבה!": "Your donation was received successfully. Thank you very much!",
+    "לא הצלחנו להשלים את התשלום. בדקו את הפרטים או נסו שוב.": "We could not complete the payment. Please check the details and try again."
+  };
+
+  function trim(value) {
+    return (value || "").replace(/\s+/g, " ").trim();
   }
 
-  function checkoutHref(amount, category) {
-    var url = new URL("./checkout.html", window.location.href);
-    if (category) url.searchParams.set("category", category);
-    if (amount) url.searchParams.set("amount", amount);
-    if (document.documentElement.lang === "en") url.searchParams.set("lang", "en");
-    return url.pathname.split("/").pop() + url.search;
+  function isEnglish() {
+    return document.documentElement.lang === "en" || document.body.getAttribute("data-lang") === "en";
   }
 
-  function rewriteDonationLinks() {
-    document.querySelectorAll('a[href*="donation.html?amount="]').forEach(function (link) {
-      var url = new URL(link.getAttribute("href"), window.location.href);
-      var amount = url.searchParams.get("amount");
-      link.setAttribute("href", checkoutHref(amount, url.searchParams.get("category") || categoryForAmount(amount)));
+  function replaceValue(value) {
+    var clean = trim(value);
+    return COPY[clean] || value;
+  }
+
+  function polishTextNode(node) {
+    var next = replaceValue(node.nodeValue);
+    if (next !== node.nodeValue) {
+      var leading = (node.nodeValue.match(/^\s*/) || [""])[0];
+      var trailing = (node.nodeValue.match(/\s*$/) || [""])[0];
+      node.nodeValue = leading + next + trailing;
+    }
+  }
+
+  function polishAttributes(element) {
+    ["placeholder", "aria-label", "title", "value"].forEach(function (attr) {
+      if (!element.hasAttribute || !element.hasAttribute(attr)) return;
+      var current = element.getAttribute(attr);
+      var next = replaceValue(current);
+      if (next !== current) element.setAttribute(attr, next);
     });
+    if ((element.tagName === "INPUT" || element.tagName === "TEXTAREA") && element.value) {
+      if (!element.dataset.heValue && /[\u0590-\u05ff]/.test(element.value)) {
+        element.dataset.heValue = element.value;
+      }
+      var valueNext = replaceValue(element.value);
+      if (valueNext !== element.value) element.value = valueNext;
+    }
+  }
+
+  function polishEnglish() {
+    if (!isEnglish() || !document.body) return;
+    document.documentElement.dir = "ltr";
+    document.body.setAttribute("dir", "ltr");
+    if (!document.getElementById("torabrura-polished-english-style")) {
+      var style = document.createElement("style");
+      style.id = "torabrura-polished-english-style";
+      style.textContent = [
+        "html[lang='en'] body{direction:ltr;text-align:left}",
+        "html[lang='en'] .top-nav,html[lang='en'] .site-header,html[lang='en'] .vision-actions{direction:ltr}",
+        "html[lang='en'] .checkout-form label,html[lang='en'] .checkout-note,html[lang='en'] .summary-row{direction:ltr;text-align:left}",
+        "html[lang='en'] input,html[lang='en'] textarea,html[lang='en'] select{direction:ltr;text-align:left}",
+        "html[lang='en'] .logo{direction:ltr}"
+      ].join("\n");
+      document.head.appendChild(style);
+    }
+
+    var walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+      acceptNode: function (node) {
+        var parent = node.parentElement;
+        if (!parent || ["SCRIPT", "STYLE", "NOSCRIPT"].indexOf(parent.tagName) !== -1) {
+          return NodeFilter.FILTER_REJECT;
+        }
+        return trim(node.nodeValue) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+      }
+    });
+    var nodes = [];
+    while (walker.nextNode()) nodes.push(walker.currentNode);
+    nodes.forEach(polishTextNode);
+    document.querySelectorAll("[placeholder], [aria-label], [title], [value], input, textarea, option, button").forEach(polishAttributes);
+
+    var title = replaceValue(document.title);
+    if (title !== document.title) document.title = title;
+  }
+
+  function schedulePolish() {
+    window.clearTimeout(window.__torabruraPolishTimer);
+    window.__torabruraPolishTimer = window.setTimeout(polishEnglish, 25);
   }
 
   document.addEventListener("click", function (event) {
-    var link = event.target.closest ? event.target.closest('a[href*="donation.html?amount="]') : null;
-    if (!link) return;
-    var url = new URL(link.getAttribute("href"), window.location.href);
-    var amount = url.searchParams.get("amount");
-    event.preventDefault();
-    window.location.href = checkoutHref(amount, url.searchParams.get("category") || categoryForAmount(amount));
+    if (event.target.closest && event.target.closest("[data-language-toggle], .language-toggle")) {
+      window.setTimeout(schedulePolish, 40);
+    }
   }, true);
 
-  document.addEventListener("submit", function (event) {
-    var form = event.target;
-    if (!form || !form.matches || !form.matches("[data-custom-amount]")) return;
-    var input = form.querySelector('input[name="custom-amount"]');
-    var amount = input ? input.value : "";
-    event.preventDefault();
-    event.stopImmediatePropagation();
-    if (!amount) {
-      if (input) input.focus();
-      return;
-    }
-    window.location.href = checkoutHref(amount, new URLSearchParams(window.location.search).get("category"));
-  }, true);
-
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", rewriteDonationLinks);
-  else rewriteDonationLinks();
-})();
-
-
-
-(function () {
-  var cardCategories = ["kollelim", "settlements", "books", "aliyah"];
-  var amountCategories = { "180": "kollelim", "900": "settlements", "3600": "books", "7200": "aliyah" };
-
-  function pageName(pathname) {
-    return (pathname || "").split("/").pop() || "index.html";
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", schedulePolish);
+  } else {
+    schedulePolish();
   }
 
-  function isDonationPage() {
-    var page = pageName(window.location.pathname);
-    return page === "donation" || page === "donation.html";
-  }
-
-  function withLang(url) {
-    if (document.documentElement.lang === "en") url.searchParams.set("lang", "en");
-    return url.pathname.split("/").pop() + url.search + url.hash;
-  }
-
-  function checkoutHref(amount, category) {
-    var url = new URL("./checkout.html", window.location.href);
-    if (category) url.searchParams.set("category", category);
-    if (amount) url.searchParams.set("amount", amount);
-    return withLang(url);
-  }
-
-  function donationAmountsHref(category) {
-    var url = new URL("./donation.html", window.location.href);
-    if (category) url.searchParams.set("category", category);
-    url.hash = "amounts";
-    return withLang(url);
-  }
-
-  function selectedCategory() {
-    return new URLSearchParams(window.location.search).get("category") || "";
-  }
-
-  function restoreDonationCategoryButtons() {
-    document.querySelectorAll(".donation-choice-section .donation-link").forEach(function (link, index) {
-      link.setAttribute("href", donationAmountsHref(cardCategories[index] || "kollelim"));
-    });
-  }
-
-  function routeAmountCardsToCheckout() {
-    var category = selectedCategory();
-    document.querySelectorAll(".donation-amounts a.amount-card").forEach(function (link) {
-      var original = new URL(link.getAttribute("href"), window.location.href);
-      var amount = original.searchParams.get("amount");
-      link.setAttribute("href", checkoutHref(amount, category || amountCategories[amount] || ""));
-    });
-  }
-
-  function showAmountsForCategory() {
-    if (!isDonationPage() || !selectedCategory()) return;
-    document.querySelectorAll(".donation-flow").forEach(function (section) {
-      section.hidden = false;
-    });
-    var choiceSection = document.querySelector(".donation-choice-section");
-    if (choiceSection) choiceSection.hidden = true;
-    document.body.classList.add("amount-selected");
-  }
-
-  function initDonationFlowRestore() {
-    restoreDonationCategoryButtons();
-    routeAmountCardsToCheckout();
-    showAmountsForCategory();
-  }
-
-  document.addEventListener("submit", function (event) {
-    var form = event.target;
-    if (!form || !form.matches || !form.matches("[data-custom-amount]")) return;
-    var input = form.querySelector('input[name="custom-amount"]');
-    var amount = input ? input.value : "";
-    event.preventDefault();
-    event.stopImmediatePropagation();
-    if (!amount) {
-      if (input) input.focus();
-      return;
-    }
-    window.location.href = checkoutHref(amount, selectedCategory());
-  }, true);
-
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", initDonationFlowRestore);
-  else initDonationFlowRestore();
-})();
-
-
-
-(function () {
-  var HOSTED_FIELDS_SCRIPT = "https://hf.tranzila.com/assets/js/thostedf.js";
-  var HANDSHAKE_ENDPOINT = window.TORA_BRURA_TRANZILA_HANDSHAKE_URL || "/api/tranzila-handshake";
-  var DEFAULT_TERMINAL = window.TORA_BRURA_TRANZILA_TERMINAL || "TRANZILA_TERMINAL_NAME";
-  var hostedFields = null;
-  var hostedFieldsReady = false;
-
-  function isCheckoutPage() {
-    var page = (window.location.pathname || "").split("/").pop();
-    return page === "checkout" || page === "checkout.html";
-  }
-
-  function addHostedFieldsStyles() {
-    if (document.getElementById("tranzila-hosted-fields-style")) return;
-    var style = document.createElement("style");
-    style.id = "tranzila-hosted-fields-style";
-    style.textContent = "
-.tranzila-hosted-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
-.tranzila-hosted-grid label{display:grid;gap:8px;color:var(--ink-deep);font-weight:800}
-.tranzila-hosted-field{width:100%;min-height:52px;padding:12px 14px;background:var(--stone-light);border:1px solid rgba(67,83,108,.24);border-radius:3px;display:flex;align-items:center}
-.tranzila-hosted-field.hosted-fields-valid{border-color:#2e7d32;background:#f4fbf4}
-.tranzila-hosted-field.hosted-fields-invalid{border-color:#b3261e;background:#fff6f5}
-.tranzila-hosted-error{min-height:18px;color:#b3261e;font-size:13px;font-weight:700}
-.tranzila-secure-note{margin:0;color:var(--ink-soft);font-size:15px;line-height:1.6;font-weight:700}
-.tranzila-status{margin:0;color:var(--gold-dark);font-weight:900}
-@media(max-width:860px){.tranzila-hosted-grid{grid-template-columns:1fr}}
-";
-    document.head.appendChild(style);
-  }
-
-  function loadHostedFieldsScript() {
-    if (window.TzlaHostedFields) return Promise.resolve();
-    var existing = document.querySelector('script[src="' + HOSTED_FIELDS_SCRIPT + '"]');
-    if (existing) {
-      return new Promise(function (resolve, reject) {
-        existing.addEventListener("load", resolve, { once: true });
-        existing.addEventListener("error", reject, { once: true });
-      });
-    }
-    return new Promise(function (resolve, reject) {
-      var script = document.createElement("script");
-      script.src = HOSTED_FIELDS_SCRIPT;
-      script.async = true;
-      script.onload = resolve;
-      script.onerror = reject;
-      document.head.appendChild(script);
-    });
-  }
-
-  function replaceCreditCardInputs() {
-    var paymentGroup = document.querySelector('.checkout-group[aria-label="פרטי אשראי"], .checkout-group[aria-label="Credit Card Details"]');
-    if (!paymentGroup || paymentGroup.dataset.tranzilaHosted === "ready") return paymentGroup;
-    paymentGroup.dataset.tranzilaHosted = "ready";
-    paymentGroup.innerHTML = [
-      '<h2>פרטי אשראי</h2>',
-      '<p class="tranzila-secure-note">שדות האשראי נטענים ישירות מחברת הסליקה Tranzila. מספר הכרטיס, התוקף וה-CVV לא נשמרים באתר ולא נשלחים ל-Google Sheets.</p>',
-      '<div class="tranzila-hosted-grid">',
-        '<label for="tranzila-card-number">מספר כרטיס<div class="tranzila-hosted-field" id="tranzila-card-number"></div><span class="tranzila-hosted-error" id="errors_for_credit_card_number"></span></label>',
-        '<label>שם בעל הכרטיס<input type="text" name="card-holder-name" autocomplete="cc-name" required></label>',
-        '<label for="tranzila-card-expiry">תוקף<div class="tranzila-hosted-field" id="tranzila-card-expiry"></div><span class="tranzila-hosted-error" id="errors_for_expiry"></span></label>',
-        '<label for="tranzila-card-cvv">שלוש ספרות בגב הכרטיס<div class="tranzila-hosted-field" id="tranzila-card-cvv"></div><span class="tranzila-hosted-error" id="errors_for_cvv"></span></label>',
-      '</div>',
-      '<p class="tranzila-status" data-tranzila-status>טוען שדות סליקה מאובטחים...</p>'
-    ].join("");
-    return paymentGroup;
-  }
-
-  function setStatus(message) {
-    var status = document.querySelector("[data-tranzila-status]");
-    if (status) status.textContent = message || "";
-  }
-
-  function setFieldError(param, message) {
-    var id = param === "number" ? "credit_card_number" : param;
-    var target = document.getElementById("errors_for_" + id);
-    if (target) target.textContent = message || "";
-  }
-
-  function clearErrors() {
-    document.querySelectorAll(".tranzila-hosted-error").forEach(function (node) {
-      node.textContent = "";
-    });
-  }
-
-  function initHostedFields() {
-    if (!window.TzlaHostedFields || hostedFields) return;
-    hostedFields = window.TzlaHostedFields.create({
-      sandbox: false,
-      fields: {
-        credit_card_number: {
-          selector: "#tranzila-card-number",
-          placeholder: "4580 4580 4580 4580",
-          tabindex: 10
-        },
-        expiry: {
-          selector: "#tranzila-card-expiry",
-          placeholder: "MM/YY",
-          version: "1",
-          tabindex: 11
-        },
-        cvv: {
-          selector: "#tranzila-card-cvv",
-          placeholder: "123",
-          tabindex: 12
-        }
-      },
-      styles: {
-        input: {
-          height: "auto",
-          width: "100%",
-          color: "#09182b",
-          "font-size": "18px",
-          "font-family": "Heebo, Arial, sans-serif"
-        },
-        select: {
-          height: "auto",
-          width: "100%",
-          color: "#09182b",
-          "font-size": "18px",
-          "font-family": "Heebo, Arial, sans-serif"
-        }
-      }
-    });
-
-    if (hostedFields.onEvent) {
-      hostedFields.onEvent("ready", function () {
-        hostedFieldsReady = true;
-        setStatus("השדות המאובטחים מוכנים לתשלום.");
-      });
-      hostedFields.onEvent("validityChange", function (event) {
-        if (!event || !event.field) return;
-        setFieldError(event.field, event.isValid ? "" : "נא לבדוק את השדה");
-      });
-      hostedFields.onEvent("submit", function () {
-        var form = document.querySelector("[data-checkout-form]");
-        if (form) requestTranzilaCharge(form);
-      });
-    } else {
-      hostedFieldsReady = true;
-      setStatus("השדות המאובטחים מוכנים לתשלום.");
-    }
-  }
-
-  function donationDataFromForm(form) {
-    var params = new URLSearchParams(window.location.search);
-    var amount = form.elements.amount ? form.elements.amount.value : params.get("amount") || "";
-    var firstName = form.elements["first-name"] ? form.elements["first-name"].value.trim() : "";
-    var lastName = form.elements["last-name"] ? form.elements["last-name"].value.trim() : "";
-    var phone = form.elements.phone ? form.elements.phone.value.trim() : "";
-    var email = form.elements.email ? form.elements.email.value.trim() : "";
-    return {
-      submittedAt: new Date().toLocaleString("he-IL"),
-      category: form.elements["category-label"] ? form.elements["category-label"].value : "תרומה",
-      categoryKey: params.get("category") || "kollelim",
-      amount: amount,
-      firstName: firstName,
-      lastName: lastName,
-      phone: phone,
-      email: email,
-      dedicationType: form.elements["dedication-type"] ? form.elements["dedication-type"].value : "",
-      dedicationName: form.elements["dedication-name"] ? form.elements["dedication-name"].value : "",
-      notes: form.elements.notes ? form.elements.notes.value : "",
-      cardHolderName: form.elements["card-holder-name"] ? form.elements["card-holder-name"].value.trim() : (firstName + " " + lastName).trim(),
-      source: "torabrura.vercel.app"
-    };
-  }
-
-  function saveDonationToSheets(data, tranzilaResponse) {
-    var sheetsUrl = window.TORA_BRURA_GOOGLE_SHEETS_URL || "";
-    if (!sheetsUrl) return Promise.resolve();
-    var payload = Object.assign({}, data, {
-      paymentStatus: "paid",
-      tranzilaTransactionId: tranzilaResponse && tranzilaResponse.transaction_response ? tranzilaResponse.transaction_response.transaction_id || "" : "",
-      cardLast4: tranzilaResponse && tranzilaResponse.transaction_response ? tranzilaResponse.transaction_response.credit_card_last_4_digits || "" : ""
-    });
-    return fetch(sheetsUrl, {
-      method: "POST",
-      mode: "no-cors",
-      body: new URLSearchParams(payload)
-    }).catch(function () {});
-  }
-
-  function createHandshake(data) {
-    return fetch(HANDSHAKE_ENDPOINT, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        amount: data.amount,
-        category: data.categoryKey,
-        contact: (data.firstName + " " + data.lastName).trim(),
-        email: data.email,
-        phone: data.phone
-      })
-    }).then(function (response) {
-      return response.json().then(function (body) {
-        if (!response.ok || !body.thtk) throw new Error(body.error || "חסר token מאובטח של Tranzila");
-        return body;
-      });
-    });
-  }
-
-  function chargeWithTranzila(data, handshake) {
-    return new Promise(function (resolve, reject) {
-      hostedFields.charge({
-        terminal_name: handshake.terminal_name || DEFAULT_TERMINAL,
-        amount: data.amount,
-        currency_code: "ILS",
-        tran_mode: "A",
-        response_language: document.documentElement.lang === "en" ? "english" : "hebrew",
-        thtk: handshake.thtk,
-        contact: (data.firstName + " " + data.lastName).trim(),
-        email: data.email,
-        phone: data.phone,
-        card_holder_name: data.cardHolderName,
-        card_holder_email: data.email,
-        phone_country_code: "+972",
-        phone_number: data.phone,
-        pdesc: data.category + (data.dedicationName ? " - " + data.dedicationName : "")
-      }, function (err, response) {
-        if (err) return reject(err);
-        resolve(response);
-      });
-    });
-  }
-
-  async function requestTranzilaCharge(form) {
-    clearErrors();
-    if (!hostedFields || !hostedFieldsReady) {
-      alert("שדות הסליקה עדיין נטענים. נסו שוב בעוד רגע.");
-      return;
-    }
-    if (!form.reportValidity()) return;
-
-    var button = form.querySelector(".checkout-submit");
-    var originalText = button ? button.textContent : "";
-    var data = donationDataFromForm(form);
-    if (button) {
-      button.disabled = true;
-      button.textContent = "מבצע תשלום מאובטח...";
-    }
-    setStatus("יוצר אישור מאובטח מול Tranzila...");
-
-    try {
-      var handshake = await createHandshake(data);
-      setStatus("שולח לחברת הסליקה...");
-      var tranzilaResponse = await chargeWithTranzila(data, handshake);
-      await saveDonationToSheets(data, tranzilaResponse);
-      setStatus("התרומה נקלטה בהצלחה. תודה רבה!");
-      alert("התרומה נקלטה בהצלחה. תודה רבה!");
-    } catch (error) {
-      if (error && error.messages) {
-        error.messages.forEach(function (message) {
-          setFieldError(message.param, message.message);
-        });
-      }
-      setStatus("לא הצלחנו להשלים את התשלום. בדקו את הפרטים או נסו שוב.");
-      alert((error && error.message) || "לא הצלחנו להשלים את התשלום כרגע.");
-    } finally {
-      if (button) {
-        button.disabled = false;
-        button.textContent = originalText;
-      }
-    }
-  }
-
-  function wireCheckoutSubmit() {
-    var form = document.querySelector("[data-checkout-form]");
-    if (!form || form.dataset.tranzilaSubmit === "ready") return;
-    form.dataset.tranzilaSubmit = "ready";
-    form.addEventListener("submit", function (event) {
-      event.preventDefault();
-      event.stopImmediatePropagation();
-      requestTranzilaCharge(form);
-    }, true);
-  }
-
-  async function initTranzilaHostedFields() {
-    if (!isCheckoutPage()) return;
-    addHostedFieldsStyles();
-    replaceCreditCardInputs();
-    wireCheckoutSubmit();
-    try {
-      await loadHostedFieldsScript();
-      initHostedFields();
-    } catch (error) {
-      setStatus("לא הצלחנו לטעון את שדות הסליקה המאובטחים של Tranzila.");
-    }
-  }
-
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", initTranzilaHostedFields);
-  else initTranzilaHostedFields();
+  new MutationObserver(schedulePolish).observe(document.documentElement, {
+    childList: true,
+    subtree: true,
+    characterData: true,
+    attributes: true,
+    attributeFilter: ["lang", "data-lang", "value", "placeholder", "aria-label", "title"]
+  });
 })();
