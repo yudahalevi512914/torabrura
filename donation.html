@@ -175,6 +175,10 @@
       var amountInput = document.querySelector('input[name="amount"]');
       var flowSections = document.querySelectorAll(".donation-flow");
       var choiceSection = document.querySelector(".donation-choice-section");
+      var formShell = document.querySelector(".donation-form-shell");
+      if (formShell) {
+        formShell.hidden = true;
+      }
       if (!amount && !category) {
         flowSections.forEach((section) => {
           section.hidden = true;
