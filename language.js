@@ -13,6 +13,7 @@
     "חזרה לבחירת תרומה": "Back to Donation Selection",
     "בואו להיות שותפים בתורת ארץ ישראל": "Join Us in the Torah of the Land of Israel",
     "יחד מחזקים לומדי תורה, כוללים, שיעורים והפצת ספרים בארץ ישראל.": "Together we strengthen Torah learners, kollelim, classes, and the publication of sacred books in the Land of Israel.",
+    "עמותת תורה ברורה": "Torah Brura Organization",
     "הישיבה": "The Vision",
     "עמוד ראשוני שמציג את הדרך, החזון והפעילות, וממנו ממשיכים לעמוד השותפות.": "A home page presenting the path, vision, and activity, leading onward to the partnership page.",
     "החזון": "Vision",
@@ -82,7 +83,8 @@
     "שם להקדשה": "Dedication Name",
     "תשלום": "Payment",
     "סכום לתרומה": "Donation Amount",
-    "המשך לתרומה": "Continue to Donation",
+    "תרומה": "Donate",
+    "המשך לתרומה": "Donate",
     "קובץ ביטול החזרים לתרומות": "Donation Refund Cancellation File",
     "הקלידו סכום": "Enter amount",
     "סכום תרומה ידני": "Custom donation amount",
@@ -206,11 +208,25 @@
     return url.pathname.split("/").pop() + url.search;
   }
 
+  function donationAmountsHref(category) {
+    var url = new URL("./donation.html", window.location.href);
+    if (category) url.searchParams.set("category", category);
+    if (document.documentElement.lang === "en") url.searchParams.set("lang", "en");
+    url.hash = "amounts";
+    return url.pathname.split("/").pop() + url.search + url.hash;
+  }
+
   function redirectDonationAmountLinks() {
-    document.querySelectorAll('a[href*="donation.html?amount="]').forEach(function (link) {
+    var categories = ["kollelim", "settlements", "books", "aliyah"];
+    document.querySelectorAll(".donation-choice-section .donation-link").forEach(function (link, index) {
+      link.setAttribute("href", donationAmountsHref(categories[index] || "kollelim"));
+    });
+
+    document.querySelectorAll(".donation-amounts a.amount-card").forEach(function (link) {
       var url = new URL(link.getAttribute("href"), window.location.href);
       var amount = url.searchParams.get("amount");
-      var category = url.searchParams.get("category") || categoryForAmount(amount);
+      var pageCategory = new URLSearchParams(window.location.search).get("category");
+      var category = pageCategory || url.searchParams.get("category") || categoryForAmount(amount);
       link.setAttribute("href", checkoutHref(amount, category));
     });
   }
@@ -220,10 +236,11 @@
     document.__donationCheckoutRouting = true;
 
     document.addEventListener("click", function (event) {
-      var link = event.target.closest ? event.target.closest('a[href*="donation.html?amount="]') : null;
+      var link = event.target.closest ? event.target.closest(".donation-amounts a.amount-card") : null;
       if (!link) return;
       var url = new URL(link.getAttribute("href"), window.location.href);
       var amount = url.searchParams.get("amount");
+      if (!amount) return;
       event.preventDefault();
       window.location.href = checkoutHref(amount, url.searchParams.get("category") || categoryForAmount(amount));
     }, true);
@@ -359,7 +376,7 @@
     "Dedication Name": "Name for dedication",
     "Payment": "Payment",
     "Donation Amount": "Donation amount",
-    "Continue to Donation": "Continue securely",
+    "Continue to Donation": "Donate",
     "Donation Refund Cancellation File": "Donation refund cancellation document",
     "Enter amount": "Enter an amount",
     "Custom donation amount": "Custom donation amount",
@@ -392,6 +409,7 @@
 
     "בואו להיות שותפים בתורת ארץ ישראל": "Become a partner in Torah rooted in the Land of Israel",
     "יחד מחזקים לומדי תורה, כוללים, שיעורים והפצת ספרים בארץ ישראל.": "Together, we strengthen Torah learning, kollelim, classes, and sacred publishing across the Land of Israel.",
+    "עמותת תורה ברורה": "Torah Brura Organization",
     "הישיבה": "Our Vision",
     "מוקדי תורה": "Torah centers",
     "לומדים ושומעי שיעורים": "learners and class participants",
@@ -409,7 +427,8 @@
     "הוצאת ספרי קודש": "Publish sacred Torah books",
     "חיזוק העלייה לארץ": "Strengthen aliyah to Israel",
     "פרטי אשראי": "Credit card details",
-    "המשך לתרומה": "Continue securely",
+    "תרומה": "Donate",
+    "המשך לתרומה": "Donate",
     "מבצע תשלום מאובטח...": "Processing secure payment...",
     "טוען שדות סליקה מאובטחים...": "Loading secure payment fields...",
     "השדות המאובטחים מוכנים לתשלום.": "Secure payment fields are ready.",
