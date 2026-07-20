@@ -159,6 +159,15 @@
     });
   }
 
+  function applyInlineTranslations(lang) {
+    document.querySelectorAll("[data-en]").forEach(function (element) {
+      if (element.__heInlineText === undefined) {
+        element.__heInlineText = element.textContent;
+      }
+      element.textContent = lang === "en" ? element.getAttribute("data-en") : element.__heInlineText;
+    });
+  }
+
   function ensureButton() {
     var header = document.querySelector(".site-header");
     var button = document.querySelector("[data-language-toggle], .language-toggle");
@@ -273,6 +282,7 @@
     document.documentElement.dir = isEnglish ? "ltr" : "rtl";
     document.body.setAttribute("data-lang", lang);
     walkText(document.body, lang);
+    applyInlineTranslations(lang);
     document.querySelectorAll("[placeholder], [aria-label], [title]").forEach(function (element) {
       ["placeholder", "aria-label", "title"].forEach(function (attr) {
         translateAttribute(element, attr, lang);
