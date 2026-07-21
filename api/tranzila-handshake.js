@@ -5,7 +5,8 @@ module.exports = async function handler(request, response) {
   }
 
   try {
-    const amount = request.body && request.body.amount;
+    const body = typeof request.body === "string" ? JSON.parse(request.body || "{}") : (request.body || {});
+    const amount = body.amount;
     const terminalName = process.env.TRANZILA_TERMINAL_NAME;
     const appKey = process.env.TRANZILA_APP_KEY;
     const secret = process.env.TRANZILA_SECRET;
@@ -28,12 +29,13 @@ module.exports = async function handler(request, response) {
 
     const crypto = require("crypto");
     const requestTime = Math.floor(Date.now() / 1000).toString();
-    const nonce = crypto.randomBytes(40).toString("hex").slice(0, 40);
+    const nonce = crypto.randomBytes(40).toString("hex");
     const accessToken = crypto
       .createHmac("sha256", secret + requestTime + nonce)
       .update(appKey)
       .digest("hex");
 
+    const sum = numericAmount.toFixed(2);
     const tranzilaResponse = await fetch("https://api.tranzila.com/v2/handshake/create", {
       method: "POST",
       headers: {
@@ -45,18 +47,33 @@ module.exports = async function handler(request, response) {
       },
       body: JSON.stringify({
         terminal_name: terminalName,
-        sum: numericAmount.toString()
+        sum: sum,
+        amount: sum,
+        currency_code: "ILS"
       })
     });
 
     const data = await tranzilaResponse.json().catch(function () { return {}; });
     if (!tranzilaResponse.ok || data.error_code) {
-      return response.status(502).json({ error: "Failed to create Tranzila handshake", details: data });
+      return response.status(502).json({
+        error: "Failed to create Tranzila handshake",
+        details: data
+      });
+    }
+
+    const thtk = data.thtk || data.token || data.handshake_token;
+    if (!thtk) {
+      return response.status(502).json({
+        error: "Tranzila did not return a handshake token",
+        details: data
+      });
     }
 
     return response.status(200).json({
-      thtk: data.thtk || data.token || data.handshake_token,
-      terminal_name: terminalName
+      thtk: thtk,
+      terminal_name: terminalName,
+      amount: sum,
+      currency_code: "ILS"
     });
   } catch (error) {
     return response.status(500).json({ error: "Unexpected Tranzila handshake error" });
