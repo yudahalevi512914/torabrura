@@ -4,6 +4,7 @@ const path = require("path");
 
 const port = process.env.PORT || 5174;
 const root = __dirname;
+const tranzilaHandshake = require("./api/tranzila-handshake");
 
 const contentTypes = {
   ".html": "text/html; charset=utf-8",
@@ -14,6 +15,30 @@ const contentTypes = {
 
 const server = http.createServer((req, res) => {
   const requestPath = decodeURIComponent(req.url.split("?")[0]);
+
+  if (requestPath === "/api/tranzila-handshake") {
+    let rawBody = "";
+    req.on("data", (chunk) => {
+      rawBody += chunk;
+      if (rawBody.length > 16 * 1024) req.destroy();
+    });
+    req.on("end", async () => {
+      try {
+        req.body = rawBody ? JSON.parse(rawBody) : {};
+      } catch (error) {
+        res.writeHead(400, { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store" });
+        res.end(JSON.stringify({ error: "Invalid JSON body" }));
+        return;
+      }
+      res.status = (statusCode) => { res.statusCode = statusCode; return res; };
+      res.json = (payload) => {
+        res.setHeader("Content-Type", "application/json; charset=utf-8");
+        res.end(JSON.stringify(payload));
+      };
+      await tranzilaHandshake(req, res);
+    });
+    return;
+  }
   const filePath = path.join(root, requestPath === "/" ? "index.html" : requestPath);
 
   if (!filePath.startsWith(root)) {

@@ -1,4 +1,5 @@
 module.exports = async function handler(request, response) {
+  response.setHeader("Cache-Control", "no-store");
   if (request.method !== "POST") {
     response.setHeader("Allow", "POST");
     return response.status(405).json({ error: "Method not allowed" });
@@ -23,7 +24,7 @@ module.exports = async function handler(request, response) {
     }
 
     const numericAmount = Number(amount);
-    if (!Number.isFinite(numericAmount) || numericAmount <= 0) {
+    if (!Number.isFinite(numericAmount) || numericAmount < 1 || numericAmount > 100000 || !/^\d+(?:\.\d{1,2})?$/.test(String(amount))) {
       return response.status(400).json({ error: "Invalid donation amount" });
     }
 
@@ -45,27 +46,20 @@ module.exports = async function handler(request, response) {
         "X-tranzila-api-nonce": nonce,
         "X-tranzila-api-access-token": accessToken
       },
-      body: JSON.stringify({
-        terminal_name: terminalName,
-        sum: sum,
-        amount: sum,
-        currency_code: "ILS"
-      })
+      body: JSON.stringify({ terminal_name: terminalName, sum: Number(sum) })
     });
 
     const data = await tranzilaResponse.json().catch(function () { return {}; });
-    if (!tranzilaResponse.ok || data.error_code) {
+    if (!tranzilaResponse.ok || Number(data.error_code) !== 0) {
       return response.status(502).json({
-        error: "Failed to create Tranzila handshake",
-        details: data
+        error: "Failed to create Tranzila handshake"
       });
     }
 
     const thtk = data.thtk || data.token || data.handshake_token;
     if (!thtk) {
       return response.status(502).json({
-        error: "Tranzila did not return a handshake token",
-        details: data
+        error: "Tranzila did not return a handshake token"
       });
     }
 
