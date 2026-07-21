@@ -22,6 +22,10 @@
   ],
   "routes": [
     {
+      "src": "/api/tranzila-handshake",
+      "dest": "/api/tranzila-handshake.js"
+    },
+    {
       "src": "/api/(.*)",
       "dest": "/api/$1"
     },
