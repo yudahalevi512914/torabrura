@@ -33,7 +33,7 @@
     </div>
   </main>
   <script>
-    window.TORA_BRURA_GOOGLE_SHEETS_URL="";
+    window.TORA_BRURA_GOOGLE_SHEETS_URL="https://script.google.com/macros/s/AKfycbyiOj-7t2MKF9e57ic0RTTYFyWO3j3sCglOorIqaap1nDb5uXy2g3USFF7sNX4J6jNN/exec";
     var params=new URLSearchParams(window.location.search),amount=params.get("amount")||"",category=params.get("category")||"kollelim";
     var labels={kollelim:"תרומה לכוללים",settlements:"תרומה ליישוב הארץ",books:"הוצאת ספרי קודש",aliyah:"חיזוק העלייה לארץ"},categoryLabel=labels[category]||"תרומה";
     var amountInput=document.querySelector('input[name="amount"]'),categoryInput=document.querySelector('input[name="category-label"]'),summaryAmount=document.querySelector("[data-summary-amount]"),summaryCategory=document.querySelector("[data-summary-category]"),form=document.querySelector("[data-checkout-form]"),statusEl=document.querySelector("[data-payment-status]"),messageEl=document.querySelector("[data-checkout-message]"),hostedFields=null;
